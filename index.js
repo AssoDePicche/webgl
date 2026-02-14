@@ -17,43 +17,82 @@ const fragmentShaderSourceCode = [
   "}",
 ].join("\n");
 
-const canvas = document.getElementById("canvas");
+const getGraphicsContext = () => {
+  const canvas = document.getElementById("canvas");
 
-const context = canvas.getContext("webgl");
+  const context = canvas.getContext("webgl");
 
-if (!context) {
-  console.log("WebGL Not Supported, trying experimental-webgl");
+  if (!context) {
+    console.log("WebGL Not Supported, trying experimental-webgl");
 
-  context = canvas.getContext("experimental-webgl");
+    context = canvas.getContext("experimental-webgl");
+  }
+
+  if (!context) {
+    console.log("Your Browser Does Not Support WebGL");
+
+    throw Error("Your Browser Does Not Support WebGL");
+  }
+
+  return context;
 }
 
-if (!context) {
-  console.log("Your Browser Does Not Support WebGL");
-}
+const createShader = (context, source, shaderType) => {
+  const shader = context.createShader(shaderType);
 
-context.clearColor(0, 0, 0, 1);
+  context.shaderSource(shader, source);
 
-context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+  context.compileShader(shader);
 
-const vertexShader = context.createShader(context.VERTEX_SHADER);
+  if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
+    console.error("Error Compiling Shader: ", context.getShaderInfoLog(shader));
+  }
 
-const fragmentShader = context.createShader(context.FRAGMENT_SHADER);
+  return shader;
+};
 
-context.shaderSource(vertexShader, vertexShaderSourceCode);
+const setupAttribute = (context, program, attribute, size, offset) => {
+  const attributeLocation = context.getAttribLocation(program, attribute);
 
-context.compileShader(vertexShader);
+  context.vertexAttribPointer(
+    attributeLocation,
+    size,
+    context.FLOAT,
+    context.FALSE,
+    5 * Float32Array.BYTES_PER_ELEMENT,
+    offset * Float32Array.BYTES_PER_ELEMENT
+  );
 
-if (!context.getShaderParameter(vertexShader, context.COMPILE_STATUS)) {
-  console.error("Error Compiling Vertex Shader: ", context.getShaderInfoLog(vertexShader));
-}
+  context.enableVertexAttribArray(attributeLocation);
+};
 
-context.shaderSource(fragmentShader, fragmentShaderSourceCode);
+const clearBackground = (context, red, green, blue, alpha) => {
+  context.clearColor(red, green, blue, alpha);
 
-context.compileShader(fragmentShader);
+  context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+};
 
-if (!context.getShaderParameter(fragmentShader, context.COMPILE_STATUS)) {
-  console.error("Error Compiling Fragment Shader: ", context.getShaderInfoLog(fragmentShader));
-}
+const linkProgram = (context, program) => {
+  context.linkProgram(program);
+
+  if (!context.getProgramParameter(program, context.LINK_STATUS)) {
+    console.error("Error Linking Program: ", context.getProgramInfoLog(program));
+  }
+
+  context.validateProgram(program);
+
+  if (!context.getProgramParameter(program, context.VALIDATE_STATUS)) {
+    console.error("Error Validating Program: ", context.getProgramInfoLog(program));
+  }
+};
+
+const context = getGraphicsContext();
+
+clearBackground(context, 0, 0, 0, 1);
+
+const vertexShader = createShader(context, vertexShaderSourceCode, context.VERTEX_SHADER);
+
+const fragmentShader = createShader(context, fragmentShaderSourceCode, context.FRAGMENT_SHADER);
 
 const program = context.createProgram();
 
@@ -61,22 +100,12 @@ context.attachShader(program, vertexShader);
 
 context.attachShader(program, fragmentShader);
 
-context.linkProgram(program);
-
-if (!context.getProgramParameter(program, context.LINK_STATUS)) {
-  console.error("Error Linking Program: ", context.getProgramInfoLog(program));
-}
-
-context.validateProgram(program);
-
-if (!context.getProgramParameter(program, context.VALIDATE_STATUS)) {
-  console.error("Error Validating Program: ", context.getProgramInfoLog(program));
-}
+linkProgram(context, program);
 
 const triangleVertices = [
-  0.0, 0.5, 1.0, 1.0, 1.0,
-  -0.5, -0.5, 0.7, 0.0, 1.0,
-  0.5, -0.5, 0.1, 1.0, 0.6,
+  0.0, 0.25, 1.0, 1.0, 1.0,
+  -0.25, -0.25, 0.7, 0.0, 1.0,
+  0.25, -0.25, 0.1, 1.0, 0.6,
 ];
 
 const triangleVerticesBuffer = context.createBuffer();
@@ -85,31 +114,9 @@ context.bindBuffer(context.ARRAY_BUFFER, triangleVerticesBuffer);
 
 context.bufferData(context.ARRAY_BUFFER, new Float32Array(triangleVertices), context.STATIC_DRAW);
 
-const positionAttributeLocation = context.getAttribLocation(program, "vertPosition");
+setupAttribute(context, program, "vertPosition", 2, 0);
 
-const colorAttributeLocation = context.getAttribLocation(program, "vertColor");
-
-context.vertexAttribPointer(
-  positionAttributeLocation,
-  2,
-  context.FLOAT,
-  context.FALSE,
-  5 * Float32Array.BYTES_PER_ELEMENT,
-  0
-);
-
-context.vertexAttribPointer(
-  colorAttributeLocation,
-  3,
-  context.FLOAT,
-  context.FALSE,
-  5 * Float32Array.BYTES_PER_ELEMENT,
-  2 * Float32Array.BYTES_PER_ELEMENT
-);
-
-context.enableVertexAttribArray(positionAttributeLocation);
-
-context.enableVertexAttribArray(colorAttributeLocation);
+setupAttribute(context, program, "vertColor", 3, 2);
 
 context.useProgram(program);
 
