@@ -1,22 +1,23 @@
 const vertexShaderSourceCode = [
   "precision mediump float;",
   "attribute vec3 vertPosition;",
-  "attribute vec3 vertColor;",
+  "attribute vec2 vertTextureCoord;",
   "uniform mat4 mWorld;",
   "uniform mat4 mView;",
   "uniform mat4 mProjection;",
-  "varying vec3 fragColor;",
+  "varying vec2 fragTextureCoord;",
   "void main() {",
-  "fragColor = vertColor;",
+  "fragTextureCoord = vertTextureCoord;",
   "gl_Position = mProjection * mView * mWorld * vec4(vertPosition, 1.0);",
   "}",
 ].join("\n");
 
 const fragmentShaderSourceCode = [
   "precision mediump float;",
-  "varying vec3 fragColor;",
+  "varying vec2 fragTextureCoord;",
+  "uniform sampler2D sampler;",
   "void main() {",
-  "gl_FragColor = vec4(fragColor, 1.0);",
+  "gl_FragColor = texture2D(sampler, fragTextureCoord);",
   "}",
 ].join("\n");
 
@@ -78,7 +79,7 @@ const setupAttribute = (context, program, attribute, size, offset) => {
     size,
     context.FLOAT,
     context.FALSE,
-    6 * Float32Array.BYTES_PER_ELEMENT,
+    5 * Float32Array.BYTES_PER_ELEMENT,
     offset * Float32Array.BYTES_PER_ELEMENT
   );
 
@@ -123,43 +124,43 @@ context.attachShader(program, fragmentShader);
 
 linkProgram(context, program);
 
-// X, Y, Z, R, G, B
+// X, Y, Z, U, V
 const vertices = [
 // Top
--1.0, 1.0, -1.0,   0.5, 0.5, 0.15,
--1.0, 1.0, 1.0,    0.5, 0.5, 0.15,
-1.0, 1.0, 1.0,     0.5, 0.5, 0.15,
-1.0, 1.0, -1.0,    0.5, 0.5, 0.15,
+  -1.0, 1.0, -1.0,   0, 0,
+  -1.0, 1.0, 1.0,    0, 1,
+   1.0, 1.0, 1.0,     1, 1,
+   1.0, 1.0, -1.0,    1, 0,
 
 // Left
--1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
--1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
--1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
--1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+  -1.0, 1.0, 1.0,    0, 0,
+  -1.0, -1.0, 1.0,   1, 0,
+  -1.0, -1.0, -1.0,  1, 1,
+  -1.0, 1.0, -1.0,   0, 1,
 
 // Right
-1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
-1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
-1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
-1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+   1.0, 1.0, 1.0,    1, 1,
+   1.0, -1.0, 1.0,   0, 1,
+   1.0, -1.0, -1.0,  0, 0,
+   1.0, 1.0, -1.0,   1, 0,
 
 // Front
-1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
--1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
--1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+   1.0, 1.0, 1.0,    1, 1,
+   1.0, -1.0, 1.0,    1, 0,
+  -1.0, -1.0, 1.0,    0, 0,
+  -1.0, 1.0, 1.0,    0, 1,
 
 // Back
-1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
--1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
--1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+   1.0, 1.0, -1.0,    0, 0,
+   1.0, -1.0, -1.0,    0, 1,
+  -1.0, -1.0, -1.0,    1, 1,
+  -1.0, 1.0, -1.0,    1, 0,
 
 // Bottom
--1.0, -1.0, -1.0,   0.5, 0.95, 1.0,
--1.0, -1.0, 1.0,    0.5, 0.95, 1.0,
-1.0, -1.0, 1.0,     0.5, 0.95, 1.0,
-1.0, -1.0, -1.0,    0.5, 0.95, 1.0,
+  -1.0, -1.0, -1.0,   1, 1,
+  -1.0, -1.0, 1.0,    1, 0,
+   1.0, -1.0, 1.0,     0, 0,
+   1.0, -1.0, -1.0,    0, 1,
 ];
 
 const indices = [
@@ -194,7 +195,21 @@ createBuffer(context, new Uint16Array(indices), context.ELEMENT_ARRAY_BUFFER);
 
 setupAttribute(context, program, "vertPosition", 3, 0);
 
-setupAttribute(context, program, "vertColor", 3, 3);
+setupAttribute(context, program, "vertTextureCoord", 2, 3);
+
+const texture = context.createTexture();
+const image = new Image();
+image.crossOrigin = "anonymous";
+image.src="crate.svg";
+image.onload = () => {
+context.bindTexture(context.TEXTURE_2D, texture);
+context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+context.bindTexture(context.TEXTURE_2D, null);
+}
 
 context.useProgram(program);
 
@@ -244,6 +259,10 @@ const loop = () => {
   context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
 
   clearBackground(context, 0, 0, 0, 1);
+
+  context.bindTexture(context.TEXTURE_2D, texture);
+
+  context.activeTexture(context.TEXTURE0);
 
   context.drawElements(context.TRIANGLES, indices.length, context.UNSIGNED_SHORT, 0);
 
