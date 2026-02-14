@@ -1,11 +1,14 @@
 const vertexShaderSourceCode = [
   "precision mediump float;",
-  "attribute vec2 vertPosition;",
+  "attribute vec3 vertPosition;",
   "attribute vec3 vertColor;",
+  "uniform mat4 mWorld;",
+  "uniform mat4 mView;",
+  "uniform mat4 mProjection;",
   "varying vec3 fragColor;",
   "void main() {",
   "fragColor = vertColor;",
-  "gl_Position = vec4(vertPosition, 0.0, 1.0);",
+  "gl_Position = mProjection * mView * mWorld * vec4(vertPosition, 1.0);",
   "}",
 ].join("\n");
 
@@ -34,8 +37,24 @@ const getGraphicsContext = () => {
     throw Error("Your Browser Does Not Support WebGL");
   }
 
+  context.enable(context.DEPTH_TEST);
+
+  context.enable(context.CULL_FACE);
+
+  context.frontFace(context.CCW);
+
+  context.cullFace(context.BACK);
+
   return context;
 }
+
+const createBuffer = (context, data, type) => {
+  const buffer = context.createBuffer();
+
+  context.bindBuffer(type, buffer);
+
+  context.bufferData(type, data, context.STATIC_DRAW);
+};
 
 const createShader = (context, source, shaderType) => {
   const shader = context.createShader(shaderType);
@@ -59,7 +78,7 @@ const setupAttribute = (context, program, attribute, size, offset) => {
     size,
     context.FLOAT,
     context.FALSE,
-    5 * Float32Array.BYTES_PER_ELEMENT,
+    6 * Float32Array.BYTES_PER_ELEMENT,
     offset * Float32Array.BYTES_PER_ELEMENT
   );
 
@@ -86,6 +105,8 @@ const linkProgram = (context, program) => {
   }
 };
 
+const deg2Rad = (degrees) => degrees * (Math.PI / 180);
+
 const context = getGraphicsContext();
 
 clearBackground(context, 0, 0, 0, 1);
@@ -102,22 +123,131 @@ context.attachShader(program, fragmentShader);
 
 linkProgram(context, program);
 
-const triangleVertices = [
-  0.0, 0.25, 1.0, 1.0, 1.0,
-  -0.25, -0.25, 0.7, 0.0, 1.0,
-  0.25, -0.25, 0.1, 1.0, 0.6,
+// X, Y, Z, R, G, B
+const vertices = [
+// Top
+-1.0, 1.0, -1.0,   0.5, 0.5, 0.15,
+-1.0, 1.0, 1.0,    0.5, 0.5, 0.15,
+1.0, 1.0, 1.0,     0.5, 0.5, 0.15,
+1.0, 1.0, -1.0,    0.5, 0.5, 0.15,
+
+// Left
+-1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
+-1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
+-1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
+-1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+
+// Right
+1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
+1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
+1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
+1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+
+// Front
+1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
+-1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
+-1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+
+// Back
+1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
+-1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
+-1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+
+// Bottom
+-1.0, -1.0, -1.0,   0.5, 0.95, 1.0,
+-1.0, -1.0, 1.0,    0.5, 0.95, 1.0,
+1.0, -1.0, 1.0,     0.5, 0.95, 1.0,
+1.0, -1.0, -1.0,    0.5, 0.95, 1.0,
 ];
 
-const triangleVerticesBuffer = context.createBuffer();
+const indices = [
+// Top
+0, 1, 2,
+0, 2, 3,
 
-context.bindBuffer(context.ARRAY_BUFFER, triangleVerticesBuffer);
+// Left
+5, 4, 6,
+6, 4, 7,
 
-context.bufferData(context.ARRAY_BUFFER, new Float32Array(triangleVertices), context.STATIC_DRAW);
+// Right
+8, 9, 10,
+8, 10, 11,
 
-setupAttribute(context, program, "vertPosition", 2, 0);
+// Front
+13, 12, 14,
+15, 14, 12,
 
-setupAttribute(context, program, "vertColor", 3, 2);
+// Back
+16, 17, 18,
+16, 18, 19,
+
+// Bottom
+21, 20, 22,
+22, 20, 23
+];
+
+createBuffer(context, new Float32Array(vertices), context.ARRAY_BUFFER);
+
+createBuffer(context, new Uint16Array(indices), context.ELEMENT_ARRAY_BUFFER);
+
+setupAttribute(context, program, "vertPosition", 3, 0);
+
+setupAttribute(context, program, "vertColor", 3, 3);
 
 context.useProgram(program);
 
-context.drawArrays(context.TRIANGLES, 0, 3);
+const worldUniformLocation = context.getUniformLocation(program, "mWorld");
+
+const worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
+
+const viewUniformLocation = context.getUniformLocation(program, "mView");
+
+const viewMatrix = glMatrix.mat4.lookAt(new Float32Array(16), [0,0,-8], [0,0,0], [0,1,0]);
+
+const projectionUniformLocation = context.getUniformLocation(program, "mProjection");
+
+const fieldOfView = deg2Rad(45);
+
+const aspectRatio = canvas.width / canvas.height;
+
+const frustumNearBound = 0.1;
+
+const frustumFarBound = 1000.0;
+
+const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
+
+context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
+
+context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
+
+context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
+
+var xRotationMatrix = new Float32Array(16);
+
+var yRotationMatrix = new Float32Array(16);
+
+var angle = 0;
+
+const identityMatrix = glMatrix.mat4.identity(new Float32Array(16));
+
+const loop = () => {
+  angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+
+  glMatrix.mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
+
+  glMatrix.mat4.rotate(xRotationMatrix, identityMatrix, angle / 2, [1, 0, 0]);
+
+  glMatrix.mat4.mul(worldMatrix, xRotationMatrix, yRotationMatrix);
+
+  context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
+
+  clearBackground(context, 0, 0, 0, 1);
+
+  context.drawElements(context.TRIANGLES, indices.length, context.UNSIGNED_SHORT, 0);
+
+  requestAnimationFrame(loop);
+};
+
+requestAnimationFrame(loop);
