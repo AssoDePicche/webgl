@@ -1,25 +1,8 @@
-const vertexShaderSourceCode = [
-  "precision mediump float;",
-  "attribute vec3 vertPosition;",
-  "attribute vec2 vertTextureCoord;",
-  "uniform mat4 mWorld;",
-  "uniform mat4 mView;",
-  "uniform mat4 mProjection;",
-  "varying vec2 fragTextureCoord;",
-  "void main() {",
-  "fragTextureCoord = vertTextureCoord;",
-  "gl_Position = mProjection * mView * mWorld * vec4(vertPosition, 1.0);",
-  "}",
-].join("\n");
+const getFileContents = async (URL) => await fetch(URL).then((resource) => resource.text());
 
-const fragmentShaderSourceCode = [
-  "precision mediump float;",
-  "varying vec2 fragTextureCoord;",
-  "uniform sampler2D sampler;",
-  "void main() {",
-  "gl_FragColor = texture2D(sampler, fragTextureCoord);",
-  "}",
-].join("\n");
+const vertexShaderSourceCode = await getFileContents("vertex.glsl");
+
+const fragmentShaderSourceCode = await getFileContents("fragment.glsl");
 
 const getGraphicsContext = () => {
   const canvas = document.getElementById("canvas");
@@ -198,17 +181,27 @@ setupAttribute(context, program, "vertPosition", 3, 0);
 setupAttribute(context, program, "vertTextureCoord", 2, 3);
 
 const texture = context.createTexture();
+
 const image = new Image();
+
 image.crossOrigin = "anonymous";
+
 image.src="crate.svg";
+
 image.onload = () => {
-context.bindTexture(context.TEXTURE_2D, texture);
-context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
-context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
-context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
-context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
-context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
-context.bindTexture(context.TEXTURE_2D, null);
+  context.bindTexture(context.TEXTURE_2D, texture);
+
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+
+  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+
+  context.bindTexture(context.TEXTURE_2D, null);
 }
 
 context.useProgram(program);
