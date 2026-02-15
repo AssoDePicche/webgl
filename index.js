@@ -91,6 +91,36 @@ const linkProgram = (context, program) => {
 
 const deg2Rad = (degrees) => degrees * (Math.PI / 180);
 
+const createTexture = (context, URL) => {
+  const texture = context.createTexture();
+
+  const image = new Image();
+
+  image.crossOrigin = "anonymous";
+
+  image.src = URL;
+
+  image.onload = () => {
+    context.bindTexture(context.TEXTURE_2D, texture);
+
+    context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+
+    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+
+    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+
+    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+
+    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+
+    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+
+    context.bindTexture(context.TEXTURE_2D, null);
+  }
+
+  return texture;
+};
+
 const context = getGraphicsContext();
 
 clearBackground(context, 0, 0, 0, 1);
@@ -180,31 +210,9 @@ setupAttribute(context, program, "vertPosition", 3, 0);
 
 setupAttribute(context, program, "vertTextureCoord", 2, 3);
 
-const texture = context.createTexture();
-
-const image = new Image();
-
-image.crossOrigin = "anonymous";
-
-image.src="crate.svg";
-
-image.onload = () => {
-  context.bindTexture(context.TEXTURE_2D, texture);
-
-  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
-
-  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
-
-  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
-
-  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
-
-  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
-
-  context.bindTexture(context.TEXTURE_2D, null);
-}
-
 context.useProgram(program);
+
+const texture = createTexture(context, "crate.svg");
 
 const worldUniformLocation = context.getUniformLocation(program, "mWorld");
 
@@ -243,9 +251,9 @@ const identityMatrix = glMatrix.mat4.identity(new Float32Array(16));
 const loop = () => {
   angle = performance.now() / 1000 / 6 * 2 * Math.PI;
 
-  glMatrix.mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
+  glMatrix.mat4.rotate(yRotationMatrix, identityMatrix, angle / 2, [0, 1, 0]);
 
-  glMatrix.mat4.rotate(xRotationMatrix, identityMatrix, angle / 2, [1, 0, 0]);
+  glMatrix.mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
 
   glMatrix.mat4.mul(worldMatrix, xRotationMatrix, yRotationMatrix);
 
