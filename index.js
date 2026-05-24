@@ -8,6 +8,14 @@ const vertexShaderSourceCode = await getFileContents("vertex.glsl");
 
 const fragmentShaderSourceCode = await getFileContents("fragment.glsl");
 
+const inputX = document.getElementById("angleX");
+
+const inputY = document.getElementById("angleY");
+
+const inputZ = document.getElementById("angleZ");
+
+const inputFieldOfView = document.getElementById("fieldOfView");
+
 const context = getGraphicsContext();
 
 clearBackground(context, 0, 0, 0, 1);
@@ -46,36 +54,28 @@ const viewMatrix = glMatrix.mat4.lookAt(new Float32Array(16), [0,0,-8], [0,0,0],
 
 const projectionUniformLocation = context.getUniformLocation(program, "mProjection");
 
-const fieldOfView = deg2Rad(45);
-
 const aspectRatio = context.canvas.width / context.canvas.height;
 
 const frustumNearBound = 0.1;
 
 const frustumFarBound = 1000.0;
 
-const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
-
-context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
-
-context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
-
-context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
-
-var angleX = 0;
-
-var angleY = 0;
-
-var angleZ = 0;
-
 const loop = () => {
-  const angle = performance.now() / 1000;
+  const fieldOfView = deg2Rad(parseFloat(inputFieldOfView.value));
 
-  angleX = angle;
+  const angleX = parseFloat(inputX.value);
 
-  angleY = angle;
+  const angleY = parseFloat(inputY.value);
 
-  angleZ = angle;
+  const angleZ = parseFloat(inputZ.value);
+
+  const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
+
+  context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
+
+  context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
+
+  context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
 
   glMatrix.mat4.identity(worldMatrix);
 
