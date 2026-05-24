@@ -85,6 +85,8 @@ export const linkProgram = (context, program) => {
 
 export const deg2Rad = (degrees) => degrees * (Math.PI / 180);
 
+export const rad2Deg = (radians) => radians * (180 / Math.PI);
+
 export const createTexture = (context, URL) => {
   const texture = context.createTexture();
 
