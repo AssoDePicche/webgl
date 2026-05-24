@@ -36,3 +36,7 @@ body {
 .input__container label {
   font-size: 2rem;
 }
+
+.output__container {
+  font-size: 1.8rem;
+}

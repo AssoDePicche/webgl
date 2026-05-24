@@ -2,7 +2,7 @@ import { indices, vertices } from './src/cube.js';
 
 import { attachEventListeners, cameraState, updateCamera } from './src/input.js';
 
-import { clearBackground, createBuffer, createShader, createTexture, deg2Rad, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
+import { clearBackground, createBuffer, createShader, createTexture, deg2Rad, getGraphicsContext, linkProgram, rad2Deg, setupAttribute } from './src/webgl.js';
 
 const getFileContents = async (URL) => await fetch(URL).then((resource) => resource.text());
 
@@ -18,9 +18,15 @@ const inputZ = document.getElementById('angleZ');
 
 const inputFieldOfView = document.getElementById('fieldOfView');
 
-const context = getGraphicsContext();
+const outputX = document.getElementById('angleX_Value');
 
-attachEventListeners(context.canvas);
+const outputY = document.getElementById('angleY_Value');
+
+const outputZ = document.getElementById('angleZ_Value');
+
+const outputFieldOfView = document.getElementById('fieldOfView_Value');
+
+const context = getGraphicsContext();
 
 clearBackground(context, 0, 0, 0, 1);
 
@@ -67,11 +73,13 @@ const loop = () => {
 
   const { phi, radius, theta } = cameraState;
 
-  const eye = vec3(
-    radius * Math.cos(phi) * Math.sin(theta),
-    radius * Math.sin(phi),
-    radius * Math.cos(phi) * Math.cos(theta),
-  );
+  const x = radius * Math.cos(phi) * Math.sin(theta);
+
+  const y = radius * Math.sin(phi);
+
+  const z = radius * Math.cos(phi) * Math.cos(theta);
+
+  const eye = vec3(x, y, z);
 
   const at = vec3(0.0, 0.0, 0.0);
 
@@ -79,13 +87,23 @@ const loop = () => {
 
   const viewMatrix = lookAt(eye, at, up);
 
-  const fieldOfView = deg2Rad(parseFloat(inputFieldOfView.value));
+  const fieldOfViewDegrees = parseFloat(inputFieldOfView.value);
+
+  const fieldOfView = deg2Rad(fieldOfViewDegrees);
 
   const angleX = parseFloat(inputX.value);
 
   const angleY = parseFloat(inputY.value);
 
   const angleZ = parseFloat(inputZ.value);
+
+  outputX.innerHTML = angleX;
+
+  outputY.innerHTML = angleY;
+
+  outputZ.innerHTML = angleZ;
+
+  outputFieldOfView.innerHTML = fieldOfViewDegrees;
 
   const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
 
@@ -115,5 +133,7 @@ const loop = () => {
 
   requestAnimationFrame(loop);
 };
+
+attachEventListeners(context.canvas);
 
 requestAnimationFrame(loop);
