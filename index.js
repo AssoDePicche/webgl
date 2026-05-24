@@ -1,12 +1,12 @@
 import { indices, vertices } from './src/cube.js';
 
+import { getFileContents } from './src/fs.js';
+
 import { attachEventListeners, cameraState, updateCamera } from './src/input.js';
 
 import { deg2Rad } from './src/utils.js';
 
 import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
-
-const getFileContents = async (URL) => await fetch(URL).then((resource) => resource.text());
 
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
