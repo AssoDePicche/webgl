@@ -20,13 +20,11 @@ const inputZ = document.getElementById('angleZ');
 
 const inputFieldOfView = document.getElementById('fieldOfView');
 
-const outputX = document.getElementById('angleX_Value');
+const inputFrustumNearBound = document.getElementById('nearBound');
 
-const outputY = document.getElementById('angleY_Value');
+const inputFrustumFarBound = document.getElementById('farBound');
 
-const outputZ = document.getElementById('angleZ_Value');
-
-const outputFieldOfView = document.getElementById('fieldOfView_Value');
+const HUD = document.getElementById('HUD');
 
 const context = getGraphicsContext();
 
@@ -66,10 +64,6 @@ const projectionUniformLocation = context.getUniformLocation(program, 'mProjecti
 
 const aspectRatio = context.canvas.width / context.canvas.height;
 
-const frustumNearBound = 0.1;
-
-const frustumFarBound = 1000.0;
-
 const loop = () => {
   updateCamera();
 
@@ -99,13 +93,11 @@ const loop = () => {
 
   const angleZ = parseFloat(inputZ.value);
 
-  outputX.innerHTML = angleX;
+  const frustumNearBound = parseFloat(inputFrustumNearBound.value);
 
-  outputY.innerHTML = angleY;
+  const frustumFarBound = parseFloat(inputFrustumFarBound.value);
 
-  outputZ.innerHTML = angleZ;
-
-  outputFieldOfView.innerHTML = fieldOfViewDegrees;
+  HUD.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
 
   const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
 
