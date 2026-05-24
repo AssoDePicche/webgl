@@ -2,7 +2,9 @@ import { indices, vertices } from './src/cube.js';
 
 import { attachEventListeners, cameraState, updateCamera } from './src/input.js';
 
-import { clearBackground, createBuffer, createShader, createTexture, deg2Rad, getGraphicsContext, linkProgram, rad2Deg, setupAttribute } from './src/webgl.js';
+import { deg2Rad } from './src/utils.js';
+
+import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
 
 const getFileContents = async (URL) => await fetch(URL).then((resource) => resource.text());
 

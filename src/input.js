@@ -1,6 +1,4 @@
-const deg2Rad = (deg) => deg * Math.PI / 180;
-
-const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(value, maximum));
+import { clamp, deg2Rad } from './utils.js';
 
 export const cameraState = {
   phi: 0.0,
