@@ -48,7 +48,7 @@ const projectionUniformLocation = context.getUniformLocation(program, "mProjecti
 
 const fieldOfView = deg2Rad(45);
 
-const aspectRatio = canvas.width / canvas.height;
+const aspectRatio = context.canvas.width / context.canvas.height;
 
 const frustumNearBound = 0.1;
 
@@ -62,30 +62,36 @@ context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
 
 context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
 
-var xRotationMatrix = new Float32Array(16);
+var angleX = 0;
 
-var yRotationMatrix = new Float32Array(16);
+var angleY = 0;
 
-var angle = 0;
-
-const identityMatrix = glMatrix.mat4.identity(new Float32Array(16));
+var angleZ = 0;
 
 const loop = () => {
-  angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+  const angle = performance.now() / 1000;
 
-  glMatrix.mat4.rotate(yRotationMatrix, identityMatrix, angle / 2, [0, 1, 0]);
+  angleX = angle;
 
-  glMatrix.mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
+  angleY = angle;
 
-  glMatrix.mat4.mul(worldMatrix, xRotationMatrix, yRotationMatrix);
+  angleZ = angle;
+
+  glMatrix.mat4.identity(worldMatrix);
+
+  glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleX, [1, 0, 0]);
+
+  glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleY, [0, 1, 0]);
+
+  glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleZ, [0, 0, 1]);
 
   context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
 
   clearBackground(context, 0, 0, 0, 1);
 
-  context.bindTexture(context.TEXTURE_2D, texture);
-
   context.activeTexture(context.TEXTURE0);
+
+  context.bindTexture(context.TEXTURE_2D, texture);
 
   context.drawElements(context.TRIANGLES, indices.length, context.UNSIGNED_SHORT, 0);
 
