@@ -4,7 +4,7 @@ const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(value, max
 
 export const cameraState = {
   phi: 0.0,
-  radius: 8.0,
+  radius: 16.0,
   theta: 0.0,
 };
 

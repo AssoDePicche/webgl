@@ -6,17 +6,17 @@ import { clearBackground, createBuffer, createShader, createTexture, deg2Rad, ge
 
 const getFileContents = async (URL) => await fetch(URL).then((resource) => resource.text());
 
-const vertexShaderSourceCode = await getFileContents("vertex.glsl");
+const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
-const fragmentShaderSourceCode = await getFileContents("fragment.glsl");
+const fragmentShaderSourceCode = await getFileContents('fragment.glsl');
 
-const inputX = document.getElementById("angleX");
+const inputX = document.getElementById('angleX');
 
-const inputY = document.getElementById("angleY");
+const inputY = document.getElementById('angleY');
 
-const inputZ = document.getElementById("angleZ");
+const inputZ = document.getElementById('angleZ');
 
-const inputFieldOfView = document.getElementById("fieldOfView");
+const inputFieldOfView = document.getElementById('fieldOfView');
 
 const context = getGraphicsContext();
 
@@ -40,23 +40,21 @@ createBuffer(context, new Float32Array(vertices), context.ARRAY_BUFFER);
 
 createBuffer(context, new Uint16Array(indices), context.ELEMENT_ARRAY_BUFFER);
 
-setupAttribute(context, program, "vertPosition", 3, 0);
+setupAttribute(context, program, 'vertPosition', 3, 0);
 
-setupAttribute(context, program, "vertTextureCoord", 2, 3);
+setupAttribute(context, program, 'vertTextureCoord', 2, 3);
 
 context.useProgram(program);
 
-const texture = createTexture(context, "crate.svg");
+const texture = createTexture(context, 'crate.svg');
 
-const worldUniformLocation = context.getUniformLocation(program, "mWorld");
+const worldUniformLocation = context.getUniformLocation(program, 'mWorld');
 
 const worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
-const viewUniformLocation = context.getUniformLocation(program, "mView");
+const viewUniformLocation = context.getUniformLocation(program, 'mView');
 
-//const viewMatrix = glMatrix.mat4.lookAt(new Float32Array(16), [0,0,-8], [0,0,0], [0,1,0]);
-
-const projectionUniformLocation = context.getUniformLocation(program, "mProjection");
+const projectionUniformLocation = context.getUniformLocation(program, 'mProjection');
 
 const aspectRatio = context.canvas.width / context.canvas.height;
 
