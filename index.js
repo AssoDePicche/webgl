@@ -1,5 +1,7 @@
 import { indices, vertices } from './src/cube.js';
 
+import { attachEventListeners, cameraState, updateCamera } from './src/input.js';
+
 import { clearBackground, createBuffer, createShader, createTexture, deg2Rad, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
 
 const getFileContents = async (URL) => await fetch(URL).then((resource) => resource.text());
@@ -17,6 +19,8 @@ const inputZ = document.getElementById("angleZ");
 const inputFieldOfView = document.getElementById("fieldOfView");
 
 const context = getGraphicsContext();
+
+attachEventListeners(context.canvas);
 
 clearBackground(context, 0, 0, 0, 1);
 
@@ -50,7 +54,7 @@ const worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
 const viewUniformLocation = context.getUniformLocation(program, "mView");
 
-const viewMatrix = glMatrix.mat4.lookAt(new Float32Array(16), [0,0,-8], [0,0,0], [0,1,0]);
+//const viewMatrix = glMatrix.mat4.lookAt(new Float32Array(16), [0,0,-8], [0,0,0], [0,1,0]);
 
 const projectionUniformLocation = context.getUniformLocation(program, "mProjection");
 
@@ -61,6 +65,22 @@ const frustumNearBound = 0.1;
 const frustumFarBound = 1000.0;
 
 const loop = () => {
+  updateCamera();
+
+  const { phi, radius, theta } = cameraState;
+
+  const eye = vec3(
+    radius * Math.cos(phi) * Math.sin(theta),
+    radius * Math.sin(phi),
+    radius * Math.cos(phi) * Math.cos(theta),
+  );
+
+  const at = vec3(0.0, 0.0, 0.0);
+
+  const up = vec3(0.0, 1.0, 0.0);
+
+  const viewMatrix = lookAt(eye, at, up);
+
   const fieldOfView = deg2Rad(parseFloat(inputFieldOfView.value));
 
   const angleX = parseFloat(inputX.value);
@@ -73,7 +93,7 @@ const loop = () => {
 
   context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
 
-  context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
+  context.uniformMatrix4fv(viewUniformLocation, context.TRUE, flatten(viewMatrix));
 
   context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
 
