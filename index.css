@@ -40,3 +40,15 @@ body {
 #HUD {
   font-size: 1.8rem;
 }
+
+#DEBUG {
+  font-family: monospace;
+  font-size: 1.2rem;
+  display: flex;
+}
+
+@media(max-width: 767px) {
+  #DEBUG {
+    flex-direction: column;
+  }
+}
