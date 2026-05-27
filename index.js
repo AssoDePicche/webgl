@@ -8,6 +8,30 @@ import { deg2Rad } from './src/utils.js';
 
 import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
 
+const formatMatrix = (matrix) => {
+  const array = (matrix.length !== 16) ? flatten(matrix) : matrix;
+
+  let buffer = '<table>';
+
+  for (let index = 0; index < array.length; index += 4) {
+    buffer += '<tr>';
+
+    array.slice(index, index + 4).forEach((cell) => {
+      buffer += '<td>';
+
+      buffer += cell.toFixed(2);
+
+      buffer += '</td>';
+    });
+
+    buffer += '</tr>';
+  }
+  
+  buffer += '</table>';
+
+  return buffer;
+};
+
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
 const fragmentShaderSourceCode = await getFileContents('fragment.glsl');
@@ -25,6 +49,26 @@ const inputFrustumNearBound = document.getElementById('nearBound');
 const inputFrustumFarBound = document.getElementById('farBound');
 
 const HUD = document.getElementById('HUD');
+
+const DEBUG = document.getElementById('DEBUG');
+
+DEBUG.innerHTML = '';
+
+const toggleDebugging = document.getElementById('toggleDebugging');
+
+var enableDebugging = false;
+
+toggleDebugging.innerHTML = 'Show Debugging';
+
+toggleDebugging.addEventListener('click', () => {
+  enableDebugging = !enableDebugging;
+
+  toggleDebugging.innerHTML = enableDebugging ? 'Hide Debugging' : 'Show Debugging';
+
+  if (!enableDebugging) {
+    DEBUG.innerHTML = '';
+  }
+});
 
 const context = getGraphicsContext();
 
@@ -100,6 +144,12 @@ const loop = () => {
   HUD.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
 
   const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
+
+  if (enableDebugging) {
+    DEBUG.innerHTML = `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
+    DEBUG.innerHTML += `<div>View  Matrix:<br />${formatMatrix(viewMatrix)}</div>`;
+    DEBUG.innerHTML += `<div>World Matrix:<br />${formatMatrix(worldMatrix)}</div>`;
+  }
 
   context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
 
