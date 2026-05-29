@@ -52,6 +52,8 @@ const HUD = document.getElementById('HUD');
 
 const DEBUG = document.getElementById('DEBUG');
 
+const ERROR = document.getElementById('error');
+
 DEBUG.innerHTML = '';
 
 const toggleDebugging = document.getElementById('toggleDebugging');
@@ -70,6 +72,7 @@ toggleDebugging.addEventListener('click', () => {
   }
 });
 
+try {
 const context = getGraphicsContext();
 
 clearBackground(context, 0, 0, 0, 1);
@@ -181,3 +184,6 @@ const loop = () => {
 attachEventListeners(context.canvas);
 
 requestAnimationFrame(loop);
+} catch (exception) {
+  ERROR.innerHTML = exception.message;
+}
