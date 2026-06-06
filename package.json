@@ -5,8 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "babel src --out-dir dist --extensions \".ts,.tsx\"",
+    "build": "vite build",
     "check-types": "tsc --noEmit",
+    "dev": "vite",
+    "preview": "vite preview",
     "test": "jest"
   },
   "repository": {
@@ -30,6 +32,7 @@
     "babel-jest": "^30.4.1",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
   }
 }
