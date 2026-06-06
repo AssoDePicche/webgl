@@ -1,3 +1,19 @@
+export const resizeCanvasToDisplaySize = (context) => {
+  const devicePixelRatio = window.devicePixelRatio || 1;
+
+  const width = Math.floor(context.canvas.clientWidth * devicePixelRatio) || 640;
+
+  const height = Math.floor(context.canvas.clientHeight * devicePixelRatio) || 480;
+
+  if (context.canvas.width !== width || context.canvas.height !== height) {
+    context.canvas.width = width;
+
+    context.canvas.height = height;
+
+    context.viewport(0, 0, width, height);
+  }
+};
+
 export const getGraphicsContext = () => {
   const canvas = document.getElementById("canvas");
 
@@ -22,6 +38,8 @@ export const getGraphicsContext = () => {
   context.frontFace(context.CCW);
 
   context.cullFace(context.BACK);
+
+  resizeCanvasToDisplaySize(context);
 
   return context;
 }
