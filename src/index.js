@@ -15,7 +15,6 @@ import {
   createTexture,
   getGraphicsContext,
   linkProgram,
-  mockCreateTexture,
   setupAttribute
 } from './webgl.js';
 
@@ -50,7 +49,9 @@ try {
 
   context.useProgram(program);
 
-  const texture = await mockCreateTexture(context, 'crate.png');
+  const textureURL = new URL('crate.png', window.location.href).href;
+
+  const texture = await createTexture(context, textureURL);
 
   const worldUniformLocation = context.getUniformLocation(program, 'mWorld');
 
