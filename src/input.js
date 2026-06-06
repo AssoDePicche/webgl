@@ -182,6 +182,11 @@ export const updateCamera = () => {
 };
 
 export const inputState = {
+  control: {
+    isDragging,
+    lastTouchDistance,
+    lastPosition,
+  },
   coords: {
     x: document.getElementById('angleX'),
     y: document.getElementById('angleY'),

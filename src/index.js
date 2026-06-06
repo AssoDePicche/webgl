@@ -103,7 +103,8 @@ try {
     const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
 
     if (uiState.enableDebugging) {
-      uiState.DEBUG.innerHTML = `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
+      uiState.DEBUG.innerHTML = `<div>(${inputState.control.isDragging}, ${inputState.control.lastTouchDistance}, ${inputState.control.lastPosition.x}, ${inputState.control.lastPosition.y})</div>`;
+      uiState.DEBUG.innerHTML += `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
       uiState.DEBUG.innerHTML += `<div>View  Matrix:<br />${formatMatrix(viewMatrix)}</div>`;
       uiState.DEBUG.innerHTML += `<div>World Matrix:<br />${formatMatrix(worldMatrix)}</div>`;
     }
