@@ -4,7 +4,7 @@ import { getFileContents } from './src/fs.js';
 
 import { attachEventListeners, cameraState, inputState, updateCamera } from './src/input.js';
 
-import { formatMatrix } from './src/ui.js'
+import { formatMatrix, uiState } from './src/ui.js'
 
 import { deg2Rad } from './src/utils.js';
 
@@ -13,30 +13,6 @@ import { clearBackground, createBuffer, createShader, createTexture, getGraphics
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
 const fragmentShaderSourceCode = await getFileContents('fragment.glsl');
-
-const HUD = document.getElementById('HUD');
-
-const DEBUG = document.getElementById('DEBUG');
-
-const ERROR = document.getElementById('error');
-
-DEBUG.innerHTML = '';
-
-const toggleDebugging = document.getElementById('toggleDebugging');
-
-var enableDebugging = false;
-
-toggleDebugging.innerHTML = 'Show Debugging';
-
-toggleDebugging.addEventListener('click', () => {
-  enableDebugging = !enableDebugging;
-
-  toggleDebugging.innerHTML = enableDebugging ? 'Hide Debugging' : 'Show Debugging';
-
-  if (!enableDebugging) {
-    DEBUG.innerHTML = '';
-  }
-});
 
 try {
   const context = getGraphicsContext();
@@ -69,7 +45,7 @@ try {
 
   const worldUniformLocation = context.getUniformLocation(program, 'mWorld');
 
- const worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
+  const worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
   const viewUniformLocation = context.getUniformLocation(program, 'mView');
 
@@ -110,14 +86,14 @@ try {
 
     const frustumFarBound = parseFloat(inputState.far.value);
 
-    HUD.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
+    uiState.HUD.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
 
     const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
 
-    if (enableDebugging) {
-      DEBUG.innerHTML = `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
-      DEBUG.innerHTML += `<div>View  Matrix:<br />${formatMatrix(viewMatrix)}</div>`;
-      DEBUG.innerHTML += `<div>World Matrix:<br />${formatMatrix(worldMatrix)}</div>`;
+    if (uiState.enableDebugging) {
+      uiState.DEBUG.innerHTML = `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
+      uiState.DEBUG.innerHTML += `<div>View  Matrix:<br />${formatMatrix(viewMatrix)}</div>`;
+      uiState.DEBUG.innerHTML += `<div>World Matrix:<br />${formatMatrix(worldMatrix)}</div>`;
     }
 
     context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
@@ -151,5 +127,5 @@ try {
 
   requestAnimationFrame(loop);
 } catch (exception) {
-  ERROR.innerHTML = exception.message;
+  uiState.ERROR.innerHTML = exception.message;
 }

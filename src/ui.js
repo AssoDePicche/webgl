@@ -21,3 +21,26 @@ export const formatMatrix = (matrix) => {
 
   return buffer;
 };
+
+export const uiState = {
+  HUD: document.getElementById('HUD'),
+  DEBUG: document.getElementById('DEBUG'),
+  ERROR: document.getElementById('error'),
+  enableDebugging: false,
+};
+
+const toggleDebugging = document.getElementById('toggleDebugging');
+
+uiState.DEBUG.innerHTML = '';
+
+toggleDebugging.innerHTML = 'Show Debugging';
+
+toggleDebugging.addEventListener('click', () => {
+  uiState.enableDebugging = !uiState.enableDebugging;
+
+  toggleDebugging.innerHTML = uiState.enableDebugging ? 'Hide Debugging' : 'Show Debugging';
+
+  if (!uiState.enableDebugging) {
+    uiState.DEBUG.innerHTML = '';
+  }
+});
