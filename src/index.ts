@@ -1,5 +1,7 @@
 import * as glMatrix from 'gl-matrix';
 
+import { BLACK } from './color.js';
+
 import { indices, vertices } from './cube.js';
 
 import { getFileContents } from './fs.js';
@@ -27,7 +29,7 @@ const fragmentShaderSourceCode = await getFileContents('fragment.glsl');
 try {
   const context: WebGLRenderingContext = getGraphicsContext();
 
-  clearBackground(context, 0, 0, 0, 1);
+  clearBackground(context, BLACK);
 
   const vertexShader = createShader(context, vertexShaderSourceCode, context.VERTEX_SHADER);
 

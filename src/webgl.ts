@@ -1,3 +1,5 @@
+import type { Color } from './color.js';
+
 export const resizeCanvasToDisplaySize = (context: WebGLRenderingContext) => {
   const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -85,7 +87,10 @@ export const setupAttribute = (context: WebGLRenderingContext, program: WebGLPro
   context.enableVertexAttribArray(attributeLocation);
 };
 
-export const clearBackground = (context: WebGLRenderingContext, red: number, green: number, blue: number, alpha: number) => { context.clearColor(red, green, blue, alpha);
+export const clearBackground = (context: WebGLRenderingContext, color: Color) => {
+  const { red, green, blue, alpha } = color;
+
+  context.clearColor(red, green, blue, alpha);
 
   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
 };
