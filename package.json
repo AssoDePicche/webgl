@@ -1,0 +1,23 @@
+{
+  "name": "webgl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AssoDePicche/webgl.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AssoDePicche/webgl/issues"
+  },
+  "homepage": "https://github.com/AssoDePicche/webgl#readme",
+  "devDependencies": {
+    "jest": "^30.4.2"
+  }
+}
