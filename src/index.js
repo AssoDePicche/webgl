@@ -41,7 +41,7 @@ try {
 
   context.useProgram(program);
 
-  const texture = createTexture(context, 'crate.svg');
+  const texture = await createTexture(context, 'crate.svg');
 
   const worldUniformLocation = context.getUniformLocation(program, 'mWorld');
 

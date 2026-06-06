@@ -84,31 +84,37 @@ export const linkProgram = (context, program) => {
 };
 
 export const createTexture = (context, URL) => {
-  const texture = context.createTexture();
+  return new Promise((resolve, reject) => {
+    const texture = context.createTexture();
 
-  const image = new Image();
+    const image = new Image();
 
-  image.crossOrigin = "anonymous";
+    image.crossOrigin = "anonymous";
 
-  image.src = URL;
+    image.src = URL;
 
-  image.onload = () => {
-    context.bindTexture(context.TEXTURE_2D, texture);
+    image.onload = () => {
+      context.bindTexture(context.TEXTURE_2D, texture);
 
-    context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+      context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
 
-    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+      context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
 
-    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+      context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
 
-    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+      context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
 
-    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+      context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
 
-    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+      context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
 
-    context.bindTexture(context.TEXTURE_2D, null);
-  }
+      context.bindTexture(context.TEXTURE_2D, null);
 
-  return texture;
+      resolve(texture);
+    }
+
+    image.onerror = (error) => {
+      reject(new Error(`Failed to load texture image: ${URL}`));
+    };
+  });
 };
