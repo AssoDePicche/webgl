@@ -1,14 +1,14 @@
-import { indices, vertices } from './src/cube.js';
+import { indices, vertices } from './cube.js';
 
-import { getFileContents } from './src/fs.js';
+import { getFileContents } from './fs.js';
 
-import { attachEventListeners, cameraState, inputState, updateCamera } from './src/input.js';
+import { attachEventListeners, cameraState, inputState, updateCamera } from './input.js';
 
-import { formatMatrix, uiState } from './src/ui.js'
+import { formatMatrix, uiState } from './ui.js'
 
-import { deg2Rad } from './src/utils.js';
+import { deg2Rad } from './utils.js';
 
-import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
+import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './webgl.js';
 
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
