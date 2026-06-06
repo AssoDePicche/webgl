@@ -37,9 +37,12 @@ export const vertices = [
   -1.0,  1.0, -1.0,   0, 1, // 23: Back-Top
 ];
 
-const CUBE_GEOMETRY = Object.freeze({
+export const CUBE_GEOMETRY = Object.freeze({
   FACES: 6,
   INDICES_PER_FACE: 6,
+  STRIDE: 5,
+  TOTAL_INDICES: 36,
+  TOTAL_VERTICES: 24,
   VERTICES_PER_FACE: 4,
 });
 

@@ -1,22 +1,14 @@
-import { indices, vertices } from './cube.js';
+import { CUBE_GEOMETRY, indices, vertices } from './cube.js';
 
 describe('Cube Geometry Generation', () => {
-  const STRIDE = 5;
-
-  const VERTICES_PER_FACE = 4;
-
-  const FACES_COUNT = 6;
-
   it('should have the correct length for vertices and indices', () => {
-    const expectedTotalVertices = VERTICES_PER_FACE * FACES_COUNT;
+    expect(vertices).toHaveLength(CUBE_GEOMETRY.TOTAL_VERTICES * CUBE_GEOMETRY.STRIDE);
 
-    expect(vertices).toHaveLength(expectedTotalVertices * STRIDE);
-
-    expect(indices).toHaveLength(FACES_COUNT * 2 * 3);
+    expect(indices).toHaveLength(CUBE_GEOMETRY.TOTAL_INDICES);
   });
 
   it('should maintain valid index bounds', () => {
-    const maxIndex = (vertices.length / STRIDE) - 1;
+    const maxIndex = (vertices.length / CUBE_GEOMETRY.STRIDE) - 1;
 
     indices.forEach(index => {
       expect(index).toBeGreaterThanOrEqual(0);
