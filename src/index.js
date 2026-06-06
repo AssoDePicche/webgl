@@ -49,7 +49,7 @@ try {
 
   context.useProgram(program);
 
-  const textureURL = new URL('crate.png', window.location.href).href;
+  const textureURL = 'https://as2.ftcdn.net/jpg/01/99/14/99/1000_F_199149981_RG8gciij11WKAQ5nKi35Xx0ovesLCRaU.jpg';
 
   const texture = await createTexture(context, textureURL);
 
