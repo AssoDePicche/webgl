@@ -43,9 +43,9 @@ try {
 
   createBuffer(context, new Uint16Array(indices), context.ELEMENT_ARRAY_BUFFER);
 
-  setupAttribute(context, program, 'vertPosition', 3, 0);
+  setupAttribute(context, program, 'aPosition', 3, 0);
 
-  setupAttribute(context, program, 'vertTextureCoord', 2, 3);
+  setupAttribute(context, program, 'textureCoordinates', 2, 3);
 
   context.useProgram(program);
 
