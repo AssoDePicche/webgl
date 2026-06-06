@@ -14,4 +14,20 @@ describe('Cube Geometry Generation', () => {
 
     expect(indices).toHaveLength(FACES_COUNT * 2 * 3);
   });
+
+  it('should maintain valid index bounds', () => {
+    const maxIndex = (vertices.length / STRIDE) - 1;
+
+    indices.forEach(index => {
+      expect(index).toBeGreaterThanOrEqual(0);
+
+      expect(index).toBeLessThanOrEqual(maxIndex);
+    });
+  });
+
+  it('should match the exact geometric data snapshot', () => {
+    expect(vertices).toMatchSnapshot();
+
+    expect(indices).toMatchSnapshot();
+  });
 });
