@@ -5,6 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "babel src --out-dir dist --extensions \".ts,.tsx\"",
+    "check-types": "tsc --noEmit",
     "test": "jest"
   },
   "repository": {
@@ -19,12 +21,15 @@
   },
   "homepage": "https://github.com/AssoDePicche/webgl#readme",
   "devDependencies": {
+    "@babel/cli": "^7.29.7",
     "@babel/core": "^7.29.7",
     "@babel/plugin-transform-runtime": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@testing-library/jest-dom": "^6.9.1",
     "babel-jest": "^30.4.1",
     "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1"
+    "jest-environment-jsdom": "^30.4.1",
+    "typescript": "^6.0.3"
   }
 }
