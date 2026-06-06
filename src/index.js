@@ -8,7 +8,16 @@ import { formatMatrix, uiState } from './ui.js'
 
 import { deg2Rad } from './utils.js';
 
-import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './webgl.js';
+import {
+  clearBackground,
+  createBuffer,
+  createShader,
+  createTexture,
+  getGraphicsContext,
+  linkProgram,
+  mockCreateTexture,
+  setupAttribute
+} from './webgl.js';
 
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
@@ -41,7 +50,7 @@ try {
 
   context.useProgram(program);
 
-  const texture = await createTexture(context, 'crate.svg');
+  const texture = await mockCreateTexture(context, 'crate.png');
 
   const worldUniformLocation = context.getUniformLocation(program, 'mWorld');
 
