@@ -4,33 +4,11 @@ import { getFileContents } from './src/fs.js';
 
 import { attachEventListeners, cameraState, updateCamera } from './src/input.js';
 
+import { formatMatrix } from './src/ui.js'
+
 import { deg2Rad } from './src/utils.js';
 
 import { clearBackground, createBuffer, createShader, createTexture, getGraphicsContext, linkProgram, setupAttribute } from './src/webgl.js';
-
-const formatMatrix = (matrix) => {
-  const array = (matrix.length !== 16) ? flatten(matrix) : matrix;
-
-  let buffer = '<table>';
-
-  for (let index = 0; index < array.length; index += 4) {
-    buffer += '<tr>';
-
-    array.slice(index, index + 4).forEach((cell) => {
-      buffer += '<td>';
-
-      buffer += cell.toFixed(2);
-
-      buffer += '</td>';
-    });
-
-    buffer += '</tr>';
-  }
-  
-  buffer += '</table>';
-
-  return buffer;
-};
 
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
