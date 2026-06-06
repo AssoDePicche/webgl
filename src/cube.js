@@ -37,41 +37,23 @@ export const vertices = [
   -1.0,  1.0, -1.0,   0, 1, // 23: Back-Top
 ];
 
-const front = [
-  0, 1, 2,
-  0, 2, 3,
-];
+const CUBE_GEOMETRY = Object.freeze({
+  FACES: 6,
+  INDICES_PER_FACE: 6,
+  VERTICES_PER_FACE: 4,
+});
 
-const back = [
-  4, 5, 6,
-  4, 6, 7,
-];
+const createCubeIndices = () => {
+  const createFaceIndices = (faceIndex) => {
+    const offset = faceIndex * CUBE_GEOMETRY.VERTICES_PER_FACE;
 
-const top = [
-  8, 9, 10,
-  8, 10, 11,
-];
+    return [
+      offset, offset + 1, offset + 2,
+      offset, offset + 2, offset + 3,
+    ];
+  };
 
-const bottom = [
-  12, 13, 14,
-  12, 14, 15,
-];
+  return Array.from({ length: CUBE_GEOMETRY.FACES }, (_, faceIndex) => createFaceIndices(faceIndex)).flat();
+};
 
-const right = [
-  16, 17, 18,
-  16, 18, 19,
-];
-
-export const left = [
-  20, 21, 22,
-  20, 22, 23
-];
-
-export const indices = [
-  ...front,
-  ...back,
-  ...top,
-  ...bottom,
-  ...right,
-  ...left,
-];
+export const indices = createCubeIndices();
