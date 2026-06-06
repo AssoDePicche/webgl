@@ -21,9 +21,9 @@ var keys = {
   d: false,
 };
 
-var isMouseDown = false;
+var isDragging = false;
 
-var lastMousePosition = {
+var lastPosition = {
   x: 0,
   y: 0,
 };
@@ -48,40 +48,68 @@ window.addEventListener('keydown', handleKeyDown);
 
 window.addEventListener('keyup', handleKeyUp);
 
-const handleMouseDown = (event) => {
-  isMouseDown = true;
+const dragStart = (clientX, clientY) => {
+  isDragging = true;
 
-  lastMousePosition = {
-    x: event.clientX,
-    y: event.clientY,
+  lastPosition = {
+    x: clientX,
+    y: clientY,
   };
 };
 
-const handleMouseUp = (event) => {
-  isMouseDown = false;
+const dragEnd = () => {
+  isDragging = false;
 };
 
-const handleMouseMove = (event) => {
-  if (!isMouseDown) {
+const dragMove = (clientX, clientY) => {
+  if (!isDragging) {
     return;
   }
 
-  const dx = event.clientX - lastMousePosition.x;
+  const dx = clientX - lastPosition.x;
 
-  const dy = event.clientY - lastMousePosition.y;
+  const dy = clientY - lastPosition.y;
 
-  cameraState.theta -= deg2Rad(dx * CONFIG.sensibility * 10);
+  const offset = 10;
 
-  cameraState.phi += deg2Rad(dy * CONFIG.sensibility * 10);
+  cameraState.theta -= deg2Rad(dx * CONFIG.sensibility * offset);
+
+  cameraState.phi += deg2Rad(dy * CONFIG.sensibility * offset);
 
   const bounds = Math.PI / 2.1;
 
   cameraState.phi = clamp(cameraState.phi, -bounds, bounds);
 
-  lastMousePosition = {
-    x: event.clientX,
-    y: event.clientY,
+  lastPosition = {
+    x: clientX,
+    y: clientY,
   };
+};
+
+const handleMouseDown = (event) => dragStart(event.clientX, event.clientY);
+
+const handleMouseUp = () => dragEnd();
+
+const handleMouseMove = (event) => dragMove(event.clientX, event.clientY);
+
+const handleTouchStart = (event) => {
+  event.preventDefault();
+
+  if (event.touches.length > 0) {
+    dragStart(event.touches[0].clientX, event.touches[0].clientY);
+  }
+};
+
+const handleTouchEnd = () => {
+  dragEnd();
+};
+
+const handleTouchMove = (event) => {
+  event.preventDefault();
+
+  if (event.touches.length > 0) {
+    dragMove(event.touches[0].clientX, event.touches[0].clientY);
+  }
 };
 
 const handleZoomInOut = (event) => {
@@ -98,6 +126,14 @@ export const attachEventListeners = (canvas) => {
   canvas.addEventListener('mouseup', handleMouseUp);
 
   canvas.addEventListener('mousemove', handleMouseMove);
+
+  canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+  canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+  canvas.addEventListener('touchend', handleTouchEnd);
+
+  canvas.addEventListener('touchcancel', handleTouchEnd);
 
   canvas.addEventListener('wheel', handleZoomInOut, { passive: false });
 };
