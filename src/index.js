@@ -41,7 +41,7 @@ try {
 
   createBuffer(context, new Float32Array(vertices), context.ARRAY_BUFFER);
 
-  createBuffer(context, new Uint16Array(indices), context.ELEMENT_ARRAY_BUFFER);
+  createBuffer(context, indices, context.ELEMENT_ARRAY_BUFFER);
 
   setupAttribute(context, program, 'aPosition', 3, 0);
 

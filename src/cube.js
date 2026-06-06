@@ -56,7 +56,9 @@ const createCubeIndices = () => {
     ];
   };
 
-  return Array.from({ length: CUBE_GEOMETRY.FACES }, (_, faceIndex) => createFaceIndices(faceIndex)).flat();
+  const indices = Array.from({ length: CUBE_GEOMETRY.FACES }, (_, faceIndex) => createFaceIndices(faceIndex)).flat();
+
+  return new Uint16Array(indices);
 };
 
 export const indices = createCubeIndices();
