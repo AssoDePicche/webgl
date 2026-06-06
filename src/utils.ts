@@ -1,5 +1,5 @@
-export const deg2Rad = (deg) => deg * Math.PI / 180;
+export const deg2Rad = (deg: number): number => deg * Math.PI / 180;
 
-export const rad2Deg = (radians) => radians * (180 / Math.PI);
+export const rad2Deg = (radians: number): number => radians * (180 / Math.PI);
 
-export const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(value, maximum));
+export const clamp = (value: number, minimum: number, maximum: number): number => Math.max(minimum, Math.min(value, maximum));

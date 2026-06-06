@@ -47,7 +47,7 @@ export const CUBE_GEOMETRY = Object.freeze({
 });
 
 const createCubeIndices = () => {
-  const createFaceIndices = (faceIndex) => {
+  const createFaceIndices = (faceIndex: number): number[] => {
     const offset = faceIndex * CUBE_GEOMETRY.VERTICES_PER_FACE;
 
     return [
@@ -56,7 +56,7 @@ const createCubeIndices = () => {
     ];
   };
 
-  const indices = Array.from({ length: CUBE_GEOMETRY.FACES }, (_, faceIndex) => createFaceIndices(faceIndex)).flat();
+  const indices: number[] = Array.from({ length: CUBE_GEOMETRY.FACES }, (_, faceIndex: number) => createFaceIndices(faceIndex)).flat();
 
   return new Uint16Array(indices);
 };

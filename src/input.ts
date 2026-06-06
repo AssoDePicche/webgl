@@ -14,23 +14,23 @@ export const CONFIG = {
   zoomSpeed: 0.5,
 };
 
-var keys = {
+var keys: { [key: string]: boolean } = {
   w: false,
   a: false,
   s: false,
   d: false,
 };
 
-var isDragging = false;
+var isDragging: boolean = false;
 
-var lastTouchDistance = 0;
+var lastTouchDistance: number = 0;
 
 var lastPosition = {
   x: 0,
   y: 0,
 };
 
-const handleKeyEvent = (event, isPressed) => {
+const handleKeyEvent = (event: KeyboardEvent, isPressed: boolean) => {
   const key = event.key.toLowerCase();
 
   if (!keys.hasOwnProperty(key)) {
@@ -42,15 +42,15 @@ const handleKeyEvent = (event, isPressed) => {
   keys[key] = isPressed;
 };
 
-const handleKeyDown = (event) => handleKeyEvent(event, true);
+const handleKeyDown = (event: KeyboardEvent) => handleKeyEvent(event, true);
 
-const handleKeyUp = (event) => handleKeyEvent(event, false);
+const handleKeyUp = (event: KeyboardEvent) => handleKeyEvent(event, false);
 
 window.addEventListener('keydown', handleKeyDown);
 
 window.addEventListener('keyup', handleKeyUp);
 
-const getTouchDistance = (t1, t2) => {
+const getTouchDistance = (t1: Touch, t2: Touch) => {
   const dx = t1.clientX - t2.clientX;
 
   const dy = t1.clientY - t2.clientY;
@@ -58,7 +58,7 @@ const getTouchDistance = (t1, t2) => {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-const dragStart = (clientX, clientY) => {
+const dragStart = (clientX: number, clientY: number) => {
   isDragging = true;
 
   lastPosition = {
@@ -71,7 +71,7 @@ const dragEnd = () => {
   isDragging = false;
 };
 
-const dragMove = (clientX, clientY) => {
+const dragMove = (clientX: number, clientY: number) => {
   if (!isDragging) {
     return;
   }
@@ -96,46 +96,46 @@ const dragMove = (clientX, clientY) => {
   };
 };
 
-const handleMouseDown = (event) => dragStart(event.clientX, event.clientY);
+const handleMouseDown = (event: MouseEvent) => dragStart(event.clientX, event.clientY);
 
 const handleMouseUp = () => dragEnd();
 
-const handleMouseMove = (event) => dragMove(event.clientX, event.clientY);
+const handleMouseMove = (event: MouseEvent) => dragMove(event.clientX, event.clientY);
 
-const handleTouchStart = (event) => {
+const handleTouchStart = (event: TouchEvent) => {
   event.preventDefault();
 
   if (event.touches.length === 1) {
-    dragStart(event.touches[0].clientX, event.touches[0].clientY);
-  } else if (event.touches.length === 2) {
+    dragStart(event.touches[0]!.clientX, event.touches[0]!.clientY);
+  } else if (event.touches.length === 2 && event.touches[0] && event.touches[1]) {
     isDragging = false;
-
+    
     lastTouchDistance = getTouchDistance(event.touches[0], event.touches[1]);
   }
 };
 
-const handleTouchEnd = (event) => {
+const handleTouchEnd = (event: TouchEvent) => {
   if (event.touches.length === 1) {
-    dragStart(event.touches[0].clientX, event.touches[0].clientY);
+    dragStart(event.touches[0]!.clientX, event.touches[0]!.clientY);
   } else if (event.touches.length === 0) {
     dragEnd();
     lastTouchDistance = 0;
   }
 };
 
-const handleTouchMove = (event) => {
+const handleTouchMove = (event: TouchEvent) => {
   event.preventDefault();
 
   if (event.touches.length === 1 && isDragging) {
-    dragMove(event.touches[0].clientX, event.touches[0].clientY);
-  } else if (event.touches.length === 2) {
-    const currentDistance = getTouchDistance(event.touches[0], event.touches[1]);
+    dragMove(event.touches[0]!.clientX, event.touches[0]!.clientY);
+  } else if (event.touches.length === 2 && event.touches[0] && event.touches[1]) {
+    const currentDistance: number = getTouchDistance(event.touches[0], event.touches[1]);
 
-    const delta = currentDistace - lastTouchDistance;
+    const delta: number = currentDistance - lastTouchDistance;
 
-    const pinchSensitivity = 0.05;
+    const pinchSensitivity: number = 0.05;
 
-    cameraState.radius -= delta * CONFIG.zoomSpeed * pinchSensitiviy;
+    cameraState.radius -= delta * CONFIG.zoomSpeed * pinchSensitivity;
 
     cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
 
@@ -143,7 +143,7 @@ const handleTouchMove = (event) => {
   }
 };
 
-const handleZoomInOut = (event) => {
+const handleZoomInOut = (event: WheelEvent) => {
   event.preventDefault();
 
   cameraState.radius += event.deltaY * CONFIG.zoomSpeed * 0.01;
@@ -151,7 +151,7 @@ const handleZoomInOut = (event) => {
   cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
 };
 
-export const attachEventListeners = (canvas) => {
+export const attachEventListeners = (canvas: HTMLCanvasElement) => {
   canvas.addEventListener('mousedown', handleMouseDown);
 
   canvas.addEventListener('mouseup', handleMouseUp);
@@ -188,11 +188,11 @@ export const inputState = {
     lastPosition,
   },
   coords: {
-    x: document.getElementById('angleX'),
-    y: document.getElementById('angleY'),
-    z: document.getElementById('angleZ'),
+    x: document.getElementById('angleX') as HTMLInputElement,
+    y: document.getElementById('angleY') as HTMLInputElement,
+    z: document.getElementById('angleZ') as HTMLInputElement,
   },
-  fov: document.getElementById('fieldOfView'),
-  near: document.getElementById('nearBound'),
-  far: document.getElementById('farBound'),
+  fov: document.getElementById('fieldOfView') as HTMLInputElement,
+  near: document.getElementById('nearBound') as HTMLInputElement,
+  far: document.getElementById('farBound') as HTMLInputElement,
 };

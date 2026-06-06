@@ -1,36 +1,33 @@
-export const resizeCanvasToDisplaySize = (context) => {
+export const resizeCanvasToDisplaySize = (context: WebGLRenderingContext) => {
   const devicePixelRatio = window.devicePixelRatio || 1;
 
-  const width = Math.floor(context.canvas.clientWidth * devicePixelRatio) || 640;
+  const canvas: HTMLCanvasElement = context.canvas as HTMLCanvasElement;
 
-  const height = Math.floor(context.canvas.clientHeight * devicePixelRatio) || 480;
+  const width = Math.floor(canvas.clientWidth * devicePixelRatio) || 640;
 
-  if (context.canvas.width !== width || context.canvas.height !== height) {
-    context.canvas.width = width;
+  const height = Math.floor(canvas.clientHeight * devicePixelRatio) || 480;
 
-    context.canvas.height = height;
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+
+    canvas.height = height;
 
     context.viewport(0, 0, width, height);
   }
 };
 
-export const getGraphicsContext = () => {
-  const canvas = document.getElementById("canvas");
+export const getGraphicsContext = (): WebGLRenderingContext => {
+  const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
 
-  const context = canvas.getContext("webgl");
-
-  if (!context) {
-    console.log("WebGL Not Supported, trying experimental-webgl");
-
-    const newContext = canvas.getContext("experimental-webgl");
-    
-    if (!newContext) {
-      console.log("Your Browser Does Not Support WebGL");
-
-      throw Error("Your Browser Does Not Support WebGL");
-    }
+  if (!canvas) {
+    throw new Error('Canvas not found');
   }
 
+  const context = canvas.getContext('webgl'); 
+
+  if (!context) {
+    throw new Error('Your Browser Does Not Support WebGL');
+  }
 
   context.enable(context.DEPTH_TEST);
 
@@ -45,7 +42,7 @@ export const getGraphicsContext = () => {
   return context;
 }
 
-export const createBuffer = (context, data, type) => {
+export const createBuffer = (context: WebGLRenderingContext, data: BufferSource, type: number) => {
   const buffer = context.createBuffer();
 
   context.bindBuffer(type, buffer);
@@ -53,28 +50,34 @@ export const createBuffer = (context, data, type) => {
   context.bufferData(type, data, context.STATIC_DRAW);
 };
 
-export const createShader = (context, source, shaderType) => {
+export const createShader = (context: WebGLRenderingContext, source: string, shaderType: number): WebGLShader => {
   const shader = context.createShader(shaderType);
+
+  if (!shader) {
+    throw new Error('Error Creating Shader');
+  }
 
   context.shaderSource(shader, source);
 
   context.compileShader(shader);
 
   if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
-    console.error("Error Compiling Shader: ", context.getShaderInfoLog(shader));
+    const infoLog = context.getShaderInfoLog(shader);
+
+    throw new Error(`Error Compiling Shader: ${infoLog || 'Unknown Error'} `);
   }
 
   return shader;
 };
 
-export const setupAttribute = (context, program, attribute, size, offset) => {
+export const setupAttribute = (context: WebGLRenderingContext, program: WebGLProgram, attribute: string, size: number, offset: number) => {
   const attributeLocation = context.getAttribLocation(program, attribute);
 
   context.vertexAttribPointer(
     attributeLocation,
     size,
     context.FLOAT,
-    context.FALSE,
+    false,
     5 * Float32Array.BYTES_PER_ELEMENT,
     offset * Float32Array.BYTES_PER_ELEMENT
   );
@@ -82,27 +85,26 @@ export const setupAttribute = (context, program, attribute, size, offset) => {
   context.enableVertexAttribArray(attributeLocation);
 };
 
-export const clearBackground = (context, red, green, blue, alpha) => {
-  context.clearColor(red, green, blue, alpha);
+export const clearBackground = (context: WebGLRenderingContext, red: number, green: number, blue: number, alpha: number) => { context.clearColor(red, green, blue, alpha);
 
   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
 };
 
-export const linkProgram = (context, program) => {
+export const linkProgram = (context: WebGLRenderingContext, program: WebGLProgram) => {
   context.linkProgram(program);
 
   if (!context.getProgramParameter(program, context.LINK_STATUS)) {
-    console.error("Error Linking Program: ", context.getProgramInfoLog(program));
+    console.error('Error Linking Program: ', context.getProgramInfoLog(program));
   }
 
   context.validateProgram(program);
 
   if (!context.getProgramParameter(program, context.VALIDATE_STATUS)) {
-    console.error("Error Validating Program: ", context.getProgramInfoLog(program));
+    console.error('Error Validating Program: ', context.getProgramInfoLog(program));
   }
 };
 
-export const createTexture = (context, URL) => {
+export const createTexture = (context: WebGLRenderingContext, URL: string): WebGLTexture => {
   return new Promise((resolve, reject) => {
     const texture = context.createTexture();
 

@@ -1,3 +1,5 @@
+import * as glMatrix from 'gl-matrix';
+
 import { indices, vertices } from './cube.js';
 
 import { getFileContents } from './fs.js';
@@ -23,7 +25,7 @@ const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 const fragmentShaderSourceCode = await getFileContents('fragment.glsl');
 
 try {
-  const context = getGraphicsContext();
+  const context: WebGLRenderingContext = getGraphicsContext();
 
   clearBackground(context, 0, 0, 0, 1);
 
@@ -84,36 +86,36 @@ try {
 
     glMatrix.mat4.lookAt(viewMatrix, eye, at, up)
 
-    const fieldOfViewDegrees = parseFloat(inputState.fov.value);
+    const fieldOfViewDegrees = parseFloat(inputState.fov!.value);
 
     const fieldOfView = deg2Rad(fieldOfViewDegrees);
 
-    const angleX = parseFloat(inputState.coords.x.value);
+    const angleX = parseFloat(inputState.coords.x!.value);
 
-    const angleY = parseFloat(inputState.coords.y.value);
+    const angleY = parseFloat(inputState.coords.y!.value);
 
-    const angleZ = parseFloat(inputState.coords.z.value);
+    const angleZ = parseFloat(inputState.coords.z!.value);
 
-    const frustumNearBound = parseFloat(inputState.near.value);
+    const frustumNearBound = parseFloat(inputState.near!.value);
 
-    const frustumFarBound = parseFloat(inputState.far.value);
+    const frustumFarBound = parseFloat(inputState.far!.value);
 
-    uiState.HUD.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
+    uiState.HUD!.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
 
     const projectionMatrix = glMatrix.mat4.perspective(new Float32Array(16), fieldOfView, aspectRatio, frustumNearBound, frustumFarBound);
 
     if (uiState.enableDebugging) {
-      uiState.DEBUG.innerHTML = `<div>(${inputState.control.isDragging}, ${inputState.control.lastTouchDistance}, ${inputState.control.lastPosition.x}, ${inputState.control.lastPosition.y})</div>`;
-      uiState.DEBUG.innerHTML += `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
-      uiState.DEBUG.innerHTML += `<div>View  Matrix:<br />${formatMatrix(viewMatrix)}</div>`;
-      uiState.DEBUG.innerHTML += `<div>World Matrix:<br />${formatMatrix(worldMatrix)}</div>`;
+      uiState.DEBUG!.innerHTML = `<div>(${inputState.control.isDragging}, ${inputState.control.lastTouchDistance}, ${inputState.control.lastPosition.x}, ${inputState.control.lastPosition.y})</div>`;
+      uiState.DEBUG!.innerHTML += `<div>Projection Matrix:<br />${formatMatrix(projectionMatrix)}</div>`;
+      uiState.DEBUG!.innerHTML += `<div>View  Matrix:<br />${formatMatrix(viewMatrix)}</div>`;
+      uiState.DEBUG!.innerHTML += `<div>World Matrix:<br />${formatMatrix(worldMatrix)}</div>`;
     }
 
-    context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
+    context.uniformMatrix4fv(worldUniformLocation, false, worldMatrix);
 
-    context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
+    context.uniformMatrix4fv(viewUniformLocation, false, viewMatrix);
 
-    context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
+    context.uniformMatrix4fv(projectionUniformLocation, false, projectionMatrix);
 
     glMatrix.mat4.identity(worldMatrix);
 
@@ -123,7 +125,7 @@ try {
 
     glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleZ, [0, 0, 1]);
 
-    context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
+    context.uniformMatrix4fv(worldUniformLocation, false, worldMatrix);
 
     context.activeTexture(context.TEXTURE0);
 
@@ -134,9 +136,9 @@ try {
     requestAnimationFrame(loop);
   };
 
-  attachEventListeners(context.canvas);
+  attachEventListeners(context.canvas as HTMLCanvasElement);
 
   requestAnimationFrame(loop);
 } catch (exception) {
-  uiState.ERROR.innerHTML = exception.message;
+  uiState.ERROR!.innerHTML = (exception as Error).message;
 }
