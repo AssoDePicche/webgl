@@ -37,28 +37,41 @@ export const vertices = [
   -1.0,  1.0, -1.0,   0, 1, // 23: Back-Top
 ];
 
-export const indices = [
-  // Front
+const front = [
   0, 1, 2,
   0, 2, 3,
+];
 
-  // Back
+const back = [
   4, 5, 6,
   4, 6, 7,
+];
 
-  // Top
+const top = [
   8, 9, 10,
   8, 10, 11,
+];
 
-  // Bottom
+const bottom = [
   12, 13, 14,
   12, 14, 15,
+];
 
-  // Right
+const right = [
   16, 17, 18,
   16, 18, 19,
+];
 
-  // Left
+export const left = [
   20, 21, 22,
   20, 22, 23
+];
+
+export const indices = [
+  ...front,
+  ...back,
+  ...top,
+  ...bottom,
+  ...right,
+  ...left,
 ];
