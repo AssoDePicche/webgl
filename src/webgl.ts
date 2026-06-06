@@ -22,14 +22,15 @@ export const getGraphicsContext = () => {
   if (!context) {
     console.log("WebGL Not Supported, trying experimental-webgl");
 
-    context = canvas.getContext("experimental-webgl");
+    const newContext = canvas.getContext("experimental-webgl");
+    
+    if (!newContext) {
+      console.log("Your Browser Does Not Support WebGL");
+
+      throw Error("Your Browser Does Not Support WebGL");
+    }
   }
 
-  if (!context) {
-    console.log("Your Browser Does Not Support WebGL");
-
-    throw Error("Your Browser Does Not Support WebGL");
-  }
 
   context.enable(context.DEPTH_TEST);
 
