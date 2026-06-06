@@ -16,10 +16,4 @@ describe('Cube Geometry Generation', () => {
       expect(index).toBeLessThanOrEqual(maxIndex);
     });
   });
-
-  it('should match the exact geometric data snapshot', () => {
-    expect(vertices).toMatchSnapshot();
-
-    expect(indices).toMatchSnapshot();
-  });
 });

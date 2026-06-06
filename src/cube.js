@@ -1,36 +1,36 @@
 // X, Y, Z, U, V
 export const vertices = [
-  // Front Face
+  // Front Face (Looking straight at +Z)
   -1.0, -1.0,  1.0,   0, 0, // 0: Bottom-Left
    1.0, -1.0,  1.0,   1, 0, // 1: Bottom-Right
    1.0,  1.0,  1.0,   1, 1, // 2: Top-Right
   -1.0,  1.0,  1.0,   0, 1, // 3: Top-Left
 
-  // Back Face
-  -1.0, -1.0, -1.0,   1, 0, // 4: Bottom-Left (Flipped U for wrapping)
-  -1.0,  1.0, -1.0,   1, 1, // 5: Top-Left
-   1.0,  1.0, -1.0,   0, 1, // 6: Top-Right
-   1.0, -1.0, -1.0,   0, 0, // 7: Bottom-Right
+  // Back Face (Looking straight at -Z - Fixed Winding and UVs)
+   1.0, -1.0, -1.0,   0, 0, // 4: Bottom-Left (from back perspective)
+  -1.0, -1.0, -1.0,   1, 0, // 5: Bottom-Right
+  -1.0,  1.0, -1.0,   1, 1, // 6: Top-Right
+   1.0,  1.0, -1.0,   0, 1, // 7: Top-Left
 
-  // Top Face
+  // Top Face (Looking straight down at +Y)
   -1.0,  1.0,  1.0,   0, 0, // 8: Front-Left
    1.0,  1.0,  1.0,   1, 0, // 9: Front-Right
    1.0,  1.0, -1.0,   1, 1, // 10: Back-Right
   -1.0,  1.0, -1.0,   0, 1, // 11: Back-Left
 
-  // Bottom Face
+  // Bottom Face (Looking straight up at -Y)
   -1.0, -1.0, -1.0,   0, 0, // 12: Back-Left
    1.0, -1.0, -1.0,   1, 0, // 13: Back-Right
    1.0, -1.0,  1.0,   1, 1, // 14: Front-Right
   -1.0, -1.0,  1.0,   0, 1, // 15: Front-Left
 
-  // Right Face
+  // Right Face (Looking straight at +X)
    1.0, -1.0,  1.0,   0, 0, // 16: Front-Bottom
    1.0, -1.0, -1.0,   1, 0, // 17: Back-Bottom
    1.0,  1.0, -1.0,   1, 1, // 18: Back-Top
    1.0,  1.0,  1.0,   0, 1, // 19: Front-Top
 
-  // Left Face
+  // Left Face (Looking straight at -X)
   -1.0, -1.0, -1.0,   0, 0, // 20: Back-Bottom
   -1.0, -1.0,  1.0,   1, 0, // 21: Front-Bottom
   -1.0,  1.0,  1.0,   1, 1, // 22: Front-Top
