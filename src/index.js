@@ -64,13 +64,15 @@ try {
 
     const z = radius * Math.cos(phi) * Math.cos(theta);
 
-    const eye = vec3(x, y, z);
+    const eye = [x, y, z];
 
-    const at = vec3(0.0, 0.0, 0.0);
+    const at = [0.0, 0.0, 0.0];
 
-    const up = vec3(0.0, 1.0, 0.0);
+    const up = [0.0, 1.0, 0.0];
 
-    const viewMatrix = lookAt(eye, at, up);
+    const viewMatrix = glMatrix.mat4.identity(new Float32Array(16));
+
+    glMatrix.mat4.lookAt(viewMatrix, eye, at, up)
 
     const fieldOfViewDegrees = parseFloat(inputState.fov.value);
 
@@ -98,7 +100,7 @@ try {
 
     context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
 
-    context.uniformMatrix4fv(viewUniformLocation, context.TRUE, flatten(viewMatrix));
+    context.uniformMatrix4fv(viewUniformLocation, context.FALSE, viewMatrix);
 
     context.uniformMatrix4fv(projectionUniformLocation, context.FALSE, projectionMatrix);
 
@@ -111,8 +113,6 @@ try {
     glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleZ, [0, 0, 1]);
 
     context.uniformMatrix4fv(worldUniformLocation, context.FALSE, worldMatrix);
-
-    clearBackground(context, 0, 0, 0, 1);
 
     context.activeTexture(context.TEXTURE0);
 
