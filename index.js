@@ -2,7 +2,7 @@ import { indices, vertices } from './src/cube.js';
 
 import { getFileContents } from './src/fs.js';
 
-import { attachEventListeners, cameraState, updateCamera } from './src/input.js';
+import { attachEventListeners, cameraState, inputState, updateCamera } from './src/input.js';
 
 import { formatMatrix } from './src/ui.js'
 
@@ -13,18 +13,6 @@ import { clearBackground, createBuffer, createShader, createTexture, getGraphics
 const vertexShaderSourceCode = await getFileContents('vertex.glsl');
 
 const fragmentShaderSourceCode = await getFileContents('fragment.glsl');
-
-const inputX = document.getElementById('angleX');
-
-const inputY = document.getElementById('angleY');
-
-const inputZ = document.getElementById('angleZ');
-
-const inputFieldOfView = document.getElementById('fieldOfView');
-
-const inputFrustumNearBound = document.getElementById('nearBound');
-
-const inputFrustumFarBound = document.getElementById('farBound');
 
 const HUD = document.getElementById('HUD');
 
@@ -108,19 +96,19 @@ const loop = () => {
 
   const viewMatrix = lookAt(eye, at, up);
 
-  const fieldOfViewDegrees = parseFloat(inputFieldOfView.value);
+  const fieldOfViewDegrees = parseFloat(inputState.fov.value);
 
   const fieldOfView = deg2Rad(fieldOfViewDegrees);
 
-  const angleX = parseFloat(inputX.value);
+  const angleX = parseFloat(inputState.coords.x.value);
 
-  const angleY = parseFloat(inputY.value);
+  const angleY = parseFloat(inputState.coords.y.value);
 
-  const angleZ = parseFloat(inputZ.value);
+  const angleZ = parseFloat(inputState.coords.z.value);
 
-  const frustumNearBound = parseFloat(inputFrustumNearBound.value);
+  const frustumNearBound = parseFloat(inputState.near.value);
 
-  const frustumFarBound = parseFloat(inputFrustumFarBound.value);
+  const frustumFarBound = parseFloat(inputState.far.value);
 
   HUD.innerHTML = `(${angleX}, ${angleY}, ${angleZ}, ${fieldOfViewDegrees}°, ${frustumNearBound}, ${frustumFarBound})`;
 

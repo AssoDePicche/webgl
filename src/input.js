@@ -113,3 +113,14 @@ export const updateCamera = () => {
 
   cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
 };
+
+export const inputState = {
+  coords: {
+    x: document.getElementById('angleX'),
+    y: document.getElementById('angleY'),
+    z: document.getElementById('angleZ'),
+  },
+  fov: document.getElementById('fieldOfView'),
+  near: document.getElementById('nearBound'),
+  far: document.getElementById('farBound'),
+};
