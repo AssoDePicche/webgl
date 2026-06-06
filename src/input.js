@@ -23,6 +23,8 @@ var keys = {
 
 var isDragging = false;
 
+var lastTouchDistance = 0;
+
 var lastPosition = {
   x: 0,
   y: 0,
@@ -47,6 +49,14 @@ const handleKeyUp = (event) => handleKeyEvent(event, false);
 window.addEventListener('keydown', handleKeyDown);
 
 window.addEventListener('keyup', handleKeyUp);
+
+const getTouchDistance = (t1, t2) => {
+  const dx = t1.clientX - t2.clientX;
+
+  const dy = t1.clientY - t2.clientY;
+
+  return Math.sqrt(dx * dx + dy * dy);
+};
 
 const dragStart = (clientX, clientY) => {
   isDragging = true;
@@ -95,20 +105,41 @@ const handleMouseMove = (event) => dragMove(event.clientX, event.clientY);
 const handleTouchStart = (event) => {
   event.preventDefault();
 
-  if (event.touches.length > 0) {
+  if (event.touches.length === 1) {
     dragStart(event.touches[0].clientX, event.touches[0].clientY);
+  } else if (event.touches.length === 2) {
+    isDragging = false;
+
+    lastTouchDistance = getTouchDistance(event.touches[0], event.touches[1]);
   }
 };
 
-const handleTouchEnd = () => {
-  dragEnd();
+const handleTouchEnd = (event) => {
+  if (event.touches.length === 1) {
+    dragStart(event.touches[0].clientX, event.touches[0].clientY);
+  } else if (event.touches.length === 0) {
+    dragEnd();
+    lastTouchDistance = 0;
+  }
 };
 
 const handleTouchMove = (event) => {
   event.preventDefault();
 
-  if (event.touches.length > 0) {
+  if (event.touches.length === 1 && isDragging) {
     dragMove(event.touches[0].clientX, event.touches[0].clientY);
+  } else if (event.touches.length === 2) {
+    const currentDistance = getTouchDistance(event.touches[0], event.touches[1]);
+
+    const delta = currentDistace - lastTouchDistance;
+
+    const pinchSensitivity = 0.05;
+
+    cameraState.radius -= delta * CONFIG.zoomSpeed * pinchSensitiviy;
+
+    cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
+
+    lastTouchDistance = currentDistance;
   }
 };
 
