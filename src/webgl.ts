@@ -109,7 +109,7 @@ export const linkProgram = (context: WebGLRenderingContext, program: WebGLProgra
   }
 };
 
-export const createTexture = (context: WebGLRenderingContext, URL: string): WebGLTexture => {
+export const createTexture = (context: WebGLRenderingContext, URL: string): Promise<WebGLTexture> => {
   return new Promise((resolve, reject) => {
     const texture = context.createTexture();
 
