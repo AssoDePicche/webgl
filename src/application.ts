@@ -62,7 +62,23 @@ export class Application {
 
         context.cullFace(context.BACK);
 
+        this.resizeCanvasToDisplaySize(window.devicePixelRatio);
+
         return context;
     };
+
+    private resizeCanvasToDisplaySize(pixelRatio: number = 1, fallbackWidth: number = 640, fallbackHeight: number = 480): void {
+        const width: number = Math.floor((this.context.canvas as HTMLCanvasElement).clientWidth * pixelRatio) || fallbackWidth;
+
+        const height: number = Math.floor((this.context.canvas as HTMLCanvasElement).clientHeight * pixelRatio) || fallbackHeight;
+
+        if ((this.context.canvas as HTMLCanvasElement).width !== width || (this.context.canvas as HTMLCanvasElement).height !== height) {
+            (this.context.canvas as HTMLCanvasElement).width = width;
+
+            (this.context.canvas as HTMLCanvasElement).height = height;
+
+            this.context.viewport(0, 0, width, height);
+        }
+    }
 }
 
