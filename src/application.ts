@@ -10,19 +10,7 @@ export class Application {
     private program: Program;
 
     public constructor(canvasId: string) {
-        const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-
-        if (!canvas) {
-            throw new Error();
-        }
-
-        const context = canvas.getContext('webgl2');
-
-        if (!context) {
-            throw new Error();
-        }
-
-        this.context = context;
+        this.context = this.getGraphicsContext(canvasId);
 
         const vertexSource = 'vertex.glsl';
 
@@ -52,5 +40,29 @@ export class Application {
 
         requestAnimationFrame(() => this.render());
     }
+
+    private getGraphicsContext(canvasId: string): WebGLRenderingContext {
+        const canvas: HTMLCanvasElement | null = document.getElementById(canvasId) as HTMLCanvasElement;
+
+        if (!canvas) {
+            throw new Error(`Canvas Element With Id '${canvasId}' Not Found`);
+        }
+
+        const context = canvas.getContext('webgl') as WebGLRenderingContext;
+
+        if (!context) {
+            throw new Error('Your Browser Does Not Support WebGL');
+        }
+
+        context.enable(context.DEPTH_TEST);
+
+        context.enable(context.CULL_FACE);
+
+        context.frontFace(context.CCW);
+
+        context.cullFace(context.BACK);
+
+        return context;
+    };
 }
 
