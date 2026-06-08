@@ -1,38 +1,44 @@
 export class Mesh {
     private context: WebGLRenderingContext;
 
-    private vertices: number[];
+    private indexBuffer: WebGLBuffer;
 
-    private buffer: WebGLBuffer;
+    private vertexBuffer: WebGLBuffer;
 
-    constructor(context: WebGLRenderingContext, vertices: number[]) {
+    constructor(context: WebGLRenderingContext, indices: Uint16Array, vertices: Float32Array) {
         this.context = context;
 
-        this.vertices = vertices;
+        this.indexBuffer = this.context.createBuffer();
 
-        this.buffer = context.createBuffer();
+        this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-        context.bindBuffer(context.ARRAY_BUFFER, this.buffer);
+        this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indices, this.context.STATIC_DRAW);
 
-        context.bufferData(context.ARRAY_BUFFER, new Float32Array(vertices), context.STATIC_DRAW);
+        this.vertexBuffer = this.context.createBuffer();
+
+        this.context.bindBuffer(this.context.ARRAY_BUFFER, this.vertexBuffer);
+
+        this.context.bufferData(this.context.ARRAY_BUFFER, vertices, this.context.STATIC_DRAW);
     }
 
-    bind(attributeLocation: number, numComponents: number) {
-        this.context.bindBuffer(this.context.ARRAY_BUFFER, this.buffer);
+    public bind(attributeLocation: number, numComponents: number, stride: number = 0, offset: number = 0): void {
+        this.context.bindBuffer(this.context.ARRAY_BUFFER, this.vertexBuffer);
 
         this.context.vertexAttribPointer(
             attributeLocation,
             numComponents,
             this.context.FLOAT,
             false,
-            0,
-            0
+            stride * Float32Array.BYTES_PER_ELEMENT,
+            offset * Float32Array.BYTES_PER_ELEMENT
         );
 
         this.context.enableVertexAttribArray(attributeLocation);
     }
 
-    draw(primitiveType = this.context.TRIANGLES) {
-        this.context.drawArrays(primitiveType, 0, this.vertices.length / 3);
+    public draw(count: number, type: number, offset: number = 0): void {
+        this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+        this.context.drawElements(this.context.TRIANGLES, count, type, offset);
     }
 }
