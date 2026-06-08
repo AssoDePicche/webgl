@@ -8,7 +8,7 @@ const vertexShaderSourceCode: string = await getFileContents('vertex.glsl');
 
 const fragmentShaderSourceCode: string = await getFileContents('fragment.glsl');
 
-const textureSource: string = 'crate.svg;
+const textureSource: string = 'crate.svg';
 
 try {
     const context: Context = new Context('canvas', vertexShaderSourceCode, fragmentShaderSourceCode, textureSource);
