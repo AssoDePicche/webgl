@@ -1,6 +1,12 @@
+import * as glMatrix from 'gl-matrix';
+
+import * as Cube from './cube.js';
+
 import { Mesh } from './mesh.js';
 
 import { Program } from './program.js';
+
+import { Texture } from './texture.js';
 
 export class Application {
     private context: WebGLRenderingContext;
@@ -9,34 +15,60 @@ export class Application {
 
     private program: Program;
 
-    public constructor(canvasId: string) {
+    private texture: Texture;
+
+    public constructor(canvasId: string, vertexSource: string, fragmentSource: string, textureSource: string) {
         this.context = this.getGraphicsContext(canvasId);
 
-        const vertexSource = 'vertex.glsl';
+        this.resizeCanvasToDisplaySize(window.devicePixelRatio);
 
-        const fragmentSource = 'fragment.glsl';
-
-        this.mesh = new Mesh(this.context, [
-            0.0, 1.0, 0.0,
-            -1.0, -1.0, 0.0,
-            1.0, -1.0, 0.0
-        ]);
+        this.mesh = new Mesh(this.context, Cube.indices, new Float32Array(Cube.vertices));
 
         this.program = new Program(this.context, vertexSource, fragmentSource);
+
+        this.texture = new Texture(this.context, textureSource);
+
+        this.program.use();
+
+        const aPosition: number = this.program.getAttribLocation('aPosition');
+
+        this.mesh.bind(aPosition, 3, Cube.CUBE_GEOMETRY.STRIDE);
+
+        const textureCoordinates: number = this.program.getAttribLocation('textureCoordinates');
+
+        this.texture.bind(textureCoordinates, 2, Cube.CUBE_GEOMETRY.STRIDE, 3);
     }
 
     public render() {
         this.context.clearColor(0.0, 0.0, 0.0, 1.0);
 
-        this.context.clear(this.context.COLOR_BUFFER_BIT);
+        this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
 
-        this.program.use();
+        const worldMatrix: glMatrix.mat4 = glMatrix.mat4.identity(new Float32Array(16));
 
-        const posAttrLocation = this.program.getAttribLocation('aPosition');
+        const aspectRatio: number = (this.context.canvas as HTMLCanvasElement).width / (this.context.canvas as HTMLCanvasElement).height;
 
-        this.mesh.bind(posAttrLocation, 3);
+        const eye: number[] = [0.0, 0.0, 2.0];
 
-        this.mesh.draw();
+        const at: number[] = [0.0, 0.0, 0.0];
+
+        const up: number[] = [0.0, 1.0, 0.0];
+
+        const viewMatrix: glMatrix.mat4 = glMatrix.mat4.identity(new Float32Array(16));
+
+        glMatrix.mat4.lookAt(viewMatrix, eye, at, up);
+
+        const projectionMatrix: glMatrix.mat4 = glMatrix.mat4.perspective(new Float32Array(16), 60, aspectRatio, 1, 1000);
+
+        this.setUniformMatrix4fv('mWorld', worldMatrix);
+
+        this.setUniformMatrix4fv('mView', viewMatrix);
+
+        this.setUniformMatrix4fv('mProjection', projectionMatrix);
+
+        this.texture.activate();
+
+        this.mesh.draw(Cube.indices.length, this.context.UNSIGNED_SHORT);
 
         requestAnimationFrame(() => this.render());
     }
@@ -62,8 +94,6 @@ export class Application {
 
         context.cullFace(context.BACK);
 
-        this.resizeCanvasToDisplaySize(window.devicePixelRatio);
-
         return context;
     };
 
@@ -79,6 +109,12 @@ export class Application {
 
             this.context.viewport(0, 0, width, height);
         }
+    }
+
+    private setUniformMatrix4fv(uniform: string, matrix: glMatrix.mat4): void {
+        const uniformLocation: WebGLUniformLocation | null = this.program.getUniformLocation(uniform);
+
+        this.context.uniformMatrix4fv(uniformLocation, false, matrix);
     }
 }
 
