@@ -1,3 +1,5 @@
+import { Point2D } from './point.js';
+
 import { clamp, deg2Rad } from './utils.js';
 
 export const cameraState = {
@@ -196,3 +198,167 @@ export const inputState = {
     near: document.getElementById('nearBound') as HTMLInputElement,
     far: document.getElementById('farBound') as HTMLInputElement,
 };
+
+export class Input {
+    private canvas: HTMLCanvasElement;
+
+    private keys: Record<string, boolean> = {
+        w: false,
+        a: false,
+        s: false,
+        d: false,
+    };
+
+    private isDragging: boolean = false;
+
+    private lastTouchDistance: number = 0;
+
+    private lastPosition: Point2D = new Point2D(0, 0);
+
+    private deltaX: number = 0;
+
+    private deltaY: number = 0;
+
+    private deltaZoom: number = 0;
+
+    public constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+
+        this.attachListeners();
+    }
+
+    private attachListeners(): void {
+        window.addEventListener('keydown', this.handleKeyDown);
+        window.addEventListener('keyup', this.handleKeyUp);
+        window.addEventListener('mouseup', this.handleMouseUp);
+
+        this.canvas.addEventListener('mousedown', this.handleMouseDown);
+        this.canvas.addEventListener('mousemove', this.handleMouseMove);
+        this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
+        this.canvas.addEventListener('touchmove', this.handleTouchStart, { passive: false });
+        this.canvas.addEventListener('touchend', this.handleTouchMove, { passive: false });
+        this.canvas.addEventListener('touchcancel', this.handleTouchEnd);
+        this.canvas.addEventListener('wheel', this.handleMouseWheel, { passive: false });
+    }
+
+    private handleKeyDown = (event: KeyboardEvent) => this.setKey(event, true);
+    private handleKeyUp = (event: KeyboardEvent) => this.setKey(event, false);
+
+    private setKey(event: KeyboardEvent, isPressed: boolean): void {
+        const key: string = event.key.toLowerCase();
+
+        if (key in this.keys) {
+            event.preventDefault();
+
+            this.keys[key] = isPressed;
+        }
+    }
+
+    public isKeyPresed(key: string): boolean {
+        return !!this.keys[key.toLowerCase()];
+    }
+
+    private handleMouseDown = (event: MouseEvent) => {
+        this.isDragging = true;
+
+        this.lastPosition = new Point2D(event.clientX, event.clientY);
+    };
+
+    private handleMouseMove = (event: MouseEvent) => {
+        if (!this.isDragging) return;
+
+        this.deltaX += event.clientX - this.lastPosition.x;
+
+        this.deltaY += event.clientY - this.lastPosition.y;
+
+        this.lastPosition = new Point2D(event.clientX, event.clientY);
+    };
+
+    private handleMouseUp = () => {
+        this.isDragging = false;
+    };
+
+    private handleTouchStart = (event: TouchEvent) => {
+        event.preventDefault();
+
+        const touches: TouchList = event.touches;
+
+        if (touches.length === 1) {
+            this.isDragging = true;
+
+            const touch: Touch = touches[0]!;
+
+            this.lastPosition = new Point2D(touch.clientX, touch.clientY);
+        } else if (touches.length === 2) {
+            this.isDragging = false;
+
+            const firstTouch = touches[0]!;
+
+            const secondTouch = touches[0]!;
+
+            this.lastTouchDistance = this.getTouchDistance(firstTouch, secondTouch);
+        }
+    };
+
+    private handleTouchMove = (event: TouchEvent) => {
+        event.preventDefault();
+
+        const touches: TouchList = event.touches;
+
+        if (touches.length === 1 && this.isDragging) {
+            const touch: Touch = touches[0]!;
+
+            this.deltaX += touch.clientX - this.lastPosition.x;
+
+            this.deltaY += touch.clientY - this.lastPosition.y;
+
+            this.lastPosition = new Point2D(touch.clientX, touch.clientY);
+        } else if (touches.length === 2) {
+            const firstTouch: Touch = touches[0]!;
+
+            const secondTouch: Touch = touches[0]!;
+
+            const currentDistance: number = this.getTouchDistance(firstTouch, secondTouch);
+
+            this.deltaZoom += currentDistance - this.lastTouchDistance;
+
+            this.lastTouchDistance = currentDistance;
+        }
+    };
+
+    private handleTouchEnd = (event: TouchEvent) => {
+        if (event.touches.length === 1) {
+            const touch: Touch = event.touches[0]!;
+
+            this.lastPosition = new Point2D(touch.clientX, touch.clientY);
+
+            this.isDragging = true;
+        } else if (event.touches.length === 0) {
+            this.isDragging = false;
+
+            this.lastTouchDistance = 0;
+        }
+    };
+
+    private handleMouseWheel = (event: WheelEvent) => {
+        event.preventDefault();
+
+        this.deltaZoom -= event.deltaY * 0.02;
+    };
+
+    private getTouchDistance(firstTouch: Touch, secondTouch: Touch): number {
+        const p = new Point2D(firstTouch.clientX, firstTouch.clientY);
+
+        const q = new Point2D(secondTouch.clientX, secondTouch.clientY);
+
+        return p.euclidian(q);
+    }
+
+    public consumeDeltas(): void {
+        this.deltaX = 0;
+
+        this.deltaY = 0;
+
+        this.deltaZoom = 0;
+    }
+}
