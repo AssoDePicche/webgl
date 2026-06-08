@@ -12,25 +12,79 @@ import { Point3D } from './point.js';
 
 import { deg2Rad } from './utils.js';
 
-interface Inputs {
-    coordsX: HTMLInputElement;
-    coordsY: HTMLInputElement;
-    coordsZ: HTMLInputElement;
-    fov: HTMLInputElement;
-    near: HTMLInputElement;
-    far: HTMLInputElement;
+class ApplicationInput {
+    private coordsX: HTMLInputElement;
+
+    private coordsY: HTMLInputElement;
+
+    private coordsZ: HTMLInputElement;
+
+    private fov: HTMLInputElement;
+
+    private near: HTMLInputElement;
+
+    private far: HTMLInputElement;
+
+    public constructor() {
+        this.coordsX = this.getSlider('angleX');
+
+        this.coordsY = this.getSlider('angleY');
+
+        this.coordsZ = this.getSlider('angleZ');
+
+        this.fov = this.getSlider('fieldOfView');
+
+        this.near = this.getSlider('nearBound');
+
+        this.far = this.getSlider('farBound');
+    }
+
+    private getSlider(id: string): HTMLInputElement {
+        const element = document.getElementById(id);
+
+        if (!element) throw new Error(`Slider Input Element #${id} was not found in DOM.`);
+
+        return element as HTMLInputElement;
+    }
+
+    public get rotations(): [number, number, number] {
+        return [
+            parseFloat(this.coordsX.value),
+            parseFloat(this.coordsY.value),
+            parseFloat(this.coordsZ.value)
+        ];
+    }
+
+    public get fieldOfViewDegrees(): number {
+        return parseFloat(this.fov.value);
+    }
+
+    public get nearBounds(): number {
+        return parseFloat(this.near.value);
+    }
+
+    public get farBounds(): number {
+        return parseFloat(this.far.value);
+    }
 }
 
 export class Application {
     private context: Context;
 
-    private camera: Camera;
-
-    private debugger: Debugger;
-
     private input: Input;
 
-    private inputs: Inputs;
+    private camera: Camera = new Camera({
+        minRadius: 1.5,
+        maxRadius: 20.0,
+        moveSpeed: 0.5,
+        sensitivity: 0.1,
+        zoomSpeed: 0.5,
+
+    });
+
+    private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
+
+    private appInput: ApplicationInput = new ApplicationInput();
 
     private worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
@@ -41,26 +95,7 @@ export class Application {
     public constructor(context: Context) {
         this.context = context;
 
-        this.camera = new Camera({
-            minRadius: 1.5,
-            maxRadius: 20.0,
-            moveSpeed: 0.5,
-            sensitivity: 0.1,
-            zoomSpeed: 0.5,
-        });
-
-        this.debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
-
         this.input = new Input(this.context.canvas);
-
-        this.inputs = {
-            coordsX: document.getElementById('angleX') as HTMLInputElement,
-            coordsY: document.getElementById('angleY') as HTMLInputElement,
-            coordsZ: document.getElementById('angleZ') as HTMLInputElement,
-            fov: document.getElementById('fieldOfView') as HTMLInputElement,
-            near: document.getElementById('nearBound') as HTMLInputElement,
-            far: document.getElementById('farBound') as HTMLInputElement,
-        };
     }
 
     public render = (): void => {
@@ -72,19 +107,15 @@ export class Application {
 
         const up: number[] = [0.0, 1.0, 0.0];
 
+        const [angleX, angleY, angleZ] = this.appInput.rotations;
+
+        const fovDegrees: number = this.appInput.fieldOfViewDegrees;
+
+        const near: number = this.appInput.nearBounds;
+
+        const far: number = this.appInput.farBounds;
+
         glMatrix.mat4.lookAt(this.viewMatrix, eye.toArray(), at, up);
-
-        const fovDegrees = parseFloat(this.inputs.fov.value);
-
-        const near = parseFloat(this.inputs.near.value);
-
-        const far = parseFloat(this.inputs.far.value);
-
-        const angleX = parseFloat(this.inputs.coordsX.value);
-
-        const angleY = parseFloat(this.inputs.coordsY.value);
-
-        const angleZ = parseFloat(this.inputs.coordsZ.value);
 
         glMatrix.mat4.perspective(this.projectionMatrix, deg2Rad(fovDegrees), this.context.aspectRatio, near, far);
 
