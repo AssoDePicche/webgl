@@ -60,8 +60,8 @@ export class Input {
         this.canvas.addEventListener('mousedown', this.handleMouseDown);
         this.canvas.addEventListener('mousemove', this.handleMouseMove);
         this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
-        this.canvas.addEventListener('touchmove', this.handleTouchStart, { passive: false });
-        this.canvas.addEventListener('touchend', this.handleTouchMove, { passive: false });
+        this.canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+        this.canvas.addEventListener('touchend', this.handleTouchEnd);
         this.canvas.addEventListener('touchcancel', this.handleTouchEnd);
         this.canvas.addEventListener('wheel', this.handleMouseWheel, { passive: false });
     }
@@ -120,7 +120,7 @@ export class Input {
 
             const firstTouch = touches[0]!;
 
-            const secondTouch = touches[0]!;
+            const secondTouch = touches[1]!;
 
             this._lastTouchDistance = this.getTouchDistance(firstTouch, secondTouch);
         }
@@ -142,7 +142,7 @@ export class Input {
         } else if (touches.length === 2) {
             const firstTouch: Touch = touches[0]!;
 
-            const secondTouch: Touch = touches[0]!;
+            const secondTouch: Touch = touches[1]!;
 
             const currentDistance: number = this.getTouchDistance(firstTouch, secondTouch);
 
