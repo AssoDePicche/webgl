@@ -47,8 +47,6 @@ export class Program {
         if (!this.context.getProgramParameter(program, this.context.LINK_STATUS)) {
             const infoLog = this.context.getProgramInfoLog(program);
 
-            console.log(infoLog)
-
             throw new Error(`Program Linking Error: ${infoLog ?? 'Unknown Error'}`);
         }
 
@@ -75,9 +73,9 @@ export class Program {
         this.context.compileShader(shader);
 
         if (!this.context.getShaderParameter(shader, this.context.COMPILE_STATUS)) {
-            this.context.deleteShader(shader);
-
             const infoLog = this.context.getShaderInfoLog(shader);
+
+            this.context.deleteShader(shader);
 
             throw new Error(`Shader Compilation Error: ${infoLog ?? 'Unknown Error'}`);
         }
