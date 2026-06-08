@@ -8,7 +8,7 @@ const vertexShaderSourceCode: string = await getFileContents('vertex.glsl');
 
 const fragmentShaderSourceCode: string = await getFileContents('fragment.glsl');
 
-const textureSource: string = 'https://as2.ftcdn.net/jpg/01/99/14/99/1000_F_199149981_RG8gciij11WKAQ5nKi35Xx0ovesLCRaU.jpg';
+const textureSource: string = 'crate.svg;
 
 try {
     const context: Context = new Context('canvas', vertexShaderSourceCode, fragmentShaderSourceCode, textureSource);

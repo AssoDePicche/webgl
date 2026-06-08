@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "noEmit": true,
     "target": "es2022",
-    "types": ["node", "jest"],
+    "types": ["node", "jest", "vite/client"],
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

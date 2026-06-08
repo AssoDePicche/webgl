@@ -32,7 +32,11 @@ export class Texture {
 
         image.crossOrigin = 'anonymous';
 
-        image.src = source;
+        const external: boolean = source.startsWith('http://') || source.startsWith('https://');
+
+        const proxy: string = external ? source : `${import.meta.env.BASE_URL}` + source.replace(/^\//, '');
+
+        image.src = proxy;
 
         image.onload = () => {
             this.context.bindTexture(bindingPoint, this.texture);
