@@ -9,42 +9,62 @@ export class Program {
         this.program = this.createProgram(vertexSource, fragmentSource);
     }
 
-    public setUniformMatrix4(name: string, matrix: number[]) {
-        const location = this.context.getUniformLocation(this.program, name);
-
-        this.context.uniformMatrix4fv(location, false, matrix);
+    public getUniformLocation(name: string): WebGLUniformLocation | null {
+        return this.context.getUniformLocation(this.program, name);
     }
 
-    public use() {
+    public setUniformMatrix4(name: string, matrix: number[], transpose: boolean = false): void {
+        const location: WebGLUniformLocation | null = this.context.getUniformLocation(this.program, name);
+
+        this.context.uniformMatrix4fv(location, transpose, matrix);
+    }
+
+    public use(): void {
         this.context.useProgram(this.program);
     }
 
-    public getAttribLocation(attribute: string) {
+    public getAttribLocation(attribute: string): number {
         return this.context.getAttribLocation(this.program, attribute);
     }
 
     private createProgram(vertexSource: string, fragmentSource: string): WebGLProgram {
-        const vertexShader = this.loadShader(this.context.VERTEX_SHADER, vertexSource);
+        const vertexShader: WebGLShader = this.loadShader(this.context.VERTEX_SHADER, vertexSource);
 
-        const fragmentShader = this.loadShader(this.context.FRAGMENT_SHADER, fragmentSource);
+        const fragmentShader: WebGLShader = this.loadShader(this.context.FRAGMENT_SHADER, fragmentSource);
 
-        const program = this.context.createProgram();
+        const program: WebGLProgram = this.context.createProgram();
+
+        if (!program) {
+            throw new Error('Could Not Create WebGL Program');
+        }
 
         this.context.attachShader(program, vertexShader);
 
         this.context.attachShader(program, fragmentShader);
 
+        this.context.linkProgram(program);
+
         if (!this.context.getProgramParameter(program, this.context.LINK_STATUS)) {
             const infoLog = this.context.getProgramInfoLog(program);
 
+            console.log(infoLog)
+
             throw new Error(`Program Linking Error: ${infoLog ?? 'Unknown Error'}`);
         }
+
+        this.context.detachShader(program, vertexShader);
+
+        this.context.detachShader(program, fragmentShader);
+
+        this.context.deleteShader(vertexShader);
+
+        this.context.deleteShader(fragmentShader);
 
         return program;
     }
 
     private loadShader(type: number, source: string): WebGLShader {
-        const shader = this.context.createShader(type);
+        const shader: WebGLShader | null = this.context.createShader(type);
 
         if (!shader) {
             throw new Error('Could not create shader');
