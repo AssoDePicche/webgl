@@ -1,204 +1,5 @@
 import { Point2D } from './point.js';
 
-import { clamp, deg2Rad } from './utils.js';
-
-export const cameraState = {
-    phi: 0.0,
-    radius: 16.0,
-    theta: 0.0,
-};
-
-export const CONFIG = {
-    minRadius: 1.5,
-    maxRadius: 20.0,
-    moveSpeed: 0.5,
-    sensibility: 0.1,
-    zoomSpeed: 0.5,
-};
-
-var keys: { [key: string]: boolean } = {
-    w: false,
-    a: false,
-    s: false,
-    d: false,
-};
-
-var isDragging: boolean = false;
-
-var lastTouchDistance: number = 0;
-
-var lastPosition = {
-    x: 0,
-    y: 0,
-};
-
-const handleKeyEvent = (event: KeyboardEvent, isPressed: boolean) => {
-    const key = event.key.toLowerCase();
-
-    if (!keys.hasOwnProperty(key)) {
-        return;
-    }
-
-    event.preventDefault();
-
-    keys[key] = isPressed;
-};
-
-const handleKeyDown = (event: KeyboardEvent) => handleKeyEvent(event, true);
-
-const handleKeyUp = (event: KeyboardEvent) => handleKeyEvent(event, false);
-
-window.addEventListener('keydown', handleKeyDown);
-
-window.addEventListener('keyup', handleKeyUp);
-
-const getTouchDistance = (t1: Touch, t2: Touch) => {
-    const dx = t1.clientX - t2.clientX;
-
-    const dy = t1.clientY - t2.clientY;
-
-    return Math.sqrt(dx * dx + dy * dy);
-};
-
-const dragStart = (clientX: number, clientY: number) => {
-    isDragging = true;
-
-    lastPosition = {
-        x: clientX,
-        y: clientY,
-    };
-};
-
-const dragEnd = () => {
-    isDragging = false;
-};
-
-const dragMove = (clientX: number, clientY: number) => {
-    if (!isDragging) {
-        return;
-    }
-
-    const dx = clientX - lastPosition.x;
-
-    const dy = clientY - lastPosition.y;
-
-    const offset = 10;
-
-    cameraState.theta -= deg2Rad(dx * CONFIG.sensibility * offset);
-
-    cameraState.phi += deg2Rad(dy * CONFIG.sensibility * offset);
-
-    const bounds = Math.PI / 2.1;
-
-    cameraState.phi = clamp(cameraState.phi, -bounds, bounds);
-
-    lastPosition = {
-        x: clientX,
-        y: clientY,
-    };
-};
-
-const handleMouseDown = (event: MouseEvent) => dragStart(event.clientX, event.clientY);
-
-const handleMouseUp = () => dragEnd();
-
-const handleMouseMove = (event: MouseEvent) => dragMove(event.clientX, event.clientY);
-
-const handleTouchStart = (event: TouchEvent) => {
-    event.preventDefault();
-
-    if (event.touches.length === 1) {
-        dragStart(event.touches[0]!.clientX, event.touches[0]!.clientY);
-    } else if (event.touches.length === 2 && event.touches[0] && event.touches[1]) {
-        isDragging = false;
-
-        lastTouchDistance = getTouchDistance(event.touches[0], event.touches[1]);
-    }
-};
-
-const handleTouchEnd = (event: TouchEvent) => {
-    if (event.touches.length === 1) {
-        dragStart(event.touches[0]!.clientX, event.touches[0]!.clientY);
-    } else if (event.touches.length === 0) {
-        dragEnd();
-        lastTouchDistance = 0;
-    }
-};
-
-const handleTouchMove = (event: TouchEvent) => {
-    event.preventDefault();
-
-    if (event.touches.length === 1 && isDragging) {
-        dragMove(event.touches[0]!.clientX, event.touches[0]!.clientY);
-    } else if (event.touches.length === 2 && event.touches[0] && event.touches[1]) {
-        const currentDistance: number = getTouchDistance(event.touches[0], event.touches[1]);
-
-        const delta: number = currentDistance - lastTouchDistance;
-
-        const pinchSensitivity: number = 0.05;
-
-        cameraState.radius -= delta * CONFIG.zoomSpeed * pinchSensitivity;
-
-        cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
-
-        lastTouchDistance = currentDistance;
-    }
-};
-
-const handleZoomInOut = (event: WheelEvent) => {
-    event.preventDefault();
-
-    cameraState.radius += event.deltaY * CONFIG.zoomSpeed * 0.01;
-
-    cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
-};
-
-export const attachEventListeners = (canvas: HTMLCanvasElement) => {
-    canvas.addEventListener('mousedown', handleMouseDown);
-
-    canvas.addEventListener('mouseup', handleMouseUp);
-
-    canvas.addEventListener('mousemove', handleMouseMove);
-
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-
-    canvas.addEventListener('touchend', handleTouchEnd);
-
-    canvas.addEventListener('touchcancel', handleTouchEnd);
-
-    canvas.addEventListener('wheel', handleZoomInOut, { passive: false });
-};
-
-export const updateCamera = () => {
-    if (keys.w) cameraState.radius -= CONFIG.zoomSpeed;
-
-    if (keys.a) cameraState.theta -= CONFIG.sensibility;
-
-    if (keys.s) cameraState.radius += CONFIG.zoomSpeed;
-
-    if (keys.d) cameraState.theta += CONFIG.sensibility;
-
-    cameraState.radius = clamp(cameraState.radius, CONFIG.minRadius, CONFIG.maxRadius);
-};
-
-export const inputState = {
-    control: {
-        isDragging,
-        lastTouchDistance,
-        lastPosition,
-    },
-    coords: {
-        x: document.getElementById('angleX') as HTMLInputElement,
-        y: document.getElementById('angleY') as HTMLInputElement,
-        z: document.getElementById('angleZ') as HTMLInputElement,
-    },
-    fov: document.getElementById('fieldOfView') as HTMLInputElement,
-    near: document.getElementById('nearBound') as HTMLInputElement,
-    far: document.getElementById('farBound') as HTMLInputElement,
-};
-
 export class Input {
     private canvas: HTMLCanvasElement;
 
@@ -211,9 +12,9 @@ export class Input {
 
     private _isDragging: boolean = false;
 
-    private lastTouchDistance: number = 0;
+    private _lastTouchDistance: number = 0;
 
-    private lastPosition: Point2D = new Point2D(0, 0);
+    private _lastPosition: Point2D = new Point2D(0, 0);
 
     private _deltaX: number = 0;
 
@@ -241,6 +42,14 @@ export class Input {
 
     public get isDragging(): boolean {
         return this._isDragging;
+    }
+
+    public get lastPosition(): Point2D {
+        return this._lastPosition;
+    }
+
+    public get lastTouchDistance(): number {
+        return this._lastTouchDistance;
     }
 
     private attachListeners(): void {
@@ -278,17 +87,17 @@ export class Input {
     private handleMouseDown = (event: MouseEvent) => {
         this._isDragging = true;
 
-        this.lastPosition = new Point2D(event.clientX, event.clientY);
+        this._lastPosition = new Point2D(event.clientX, event.clientY);
     };
 
     private handleMouseMove = (event: MouseEvent) => {
         if (!this._isDragging) return;
 
-        this._deltaX += event.clientX - this.lastPosition.x;
+        this._deltaX += event.clientX - this._lastPosition.x;
 
-        this._deltaY += event.clientY - this.lastPosition.y;
+        this._deltaY += event.clientY - this._lastPosition.y;
 
-        this.lastPosition = new Point2D(event.clientX, event.clientY);
+        this._lastPosition = new Point2D(event.clientX, event.clientY);
     };
 
     private handleMouseUp = () => {
@@ -305,7 +114,7 @@ export class Input {
 
             const touch: Touch = touches[0]!;
 
-            this.lastPosition = new Point2D(touch.clientX, touch.clientY);
+            this._lastPosition = new Point2D(touch.clientX, touch.clientY);
         } else if (touches.length === 2) {
             this._isDragging = false;
 
@@ -313,7 +122,7 @@ export class Input {
 
             const secondTouch = touches[0]!;
 
-            this.lastTouchDistance = this.getTouchDistance(firstTouch, secondTouch);
+            this._lastTouchDistance = this.getTouchDistance(firstTouch, secondTouch);
         }
     };
 
@@ -325,11 +134,11 @@ export class Input {
         if (touches.length === 1 && this._isDragging) {
             const touch: Touch = touches[0]!;
 
-            this._deltaX += touch.clientX - this.lastPosition.x;
+            this._deltaX += touch.clientX - this._lastPosition.x;
 
-            this._deltaY += touch.clientY - this.lastPosition.y;
+            this._deltaY += touch.clientY - this._lastPosition.y;
 
-            this.lastPosition = new Point2D(touch.clientX, touch.clientY);
+            this._lastPosition = new Point2D(touch.clientX, touch.clientY);
         } else if (touches.length === 2) {
             const firstTouch: Touch = touches[0]!;
 
@@ -337,9 +146,9 @@ export class Input {
 
             const currentDistance: number = this.getTouchDistance(firstTouch, secondTouch);
 
-            this._deltaZoom += currentDistance - this.lastTouchDistance;
+            this._deltaZoom += currentDistance - this._lastTouchDistance;
 
-            this.lastTouchDistance = currentDistance;
+            this._lastTouchDistance = currentDistance;
         }
     };
 
@@ -347,13 +156,13 @@ export class Input {
         if (event.touches.length === 1) {
             const touch: Touch = event.touches[0]!;
 
-            this.lastPosition = new Point2D(touch.clientX, touch.clientY);
+            this._lastPosition = new Point2D(touch.clientX, touch.clientY);
 
             this._isDragging = true;
         } else if (event.touches.length === 0) {
             this._isDragging = false;
 
-            this.lastTouchDistance = 0;
+            this._lastTouchDistance = 0;
         }
     };
 
@@ -371,7 +180,7 @@ export class Input {
         return p.euclidian(q);
     }
 
-    public consumeDeltas(): void {
+    public flush(): void {
         this._deltaX = 0;
 
         this._deltaY = 0;

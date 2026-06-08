@@ -13,7 +13,7 @@ export class Debugger {
 
     private toggleButton: HTMLElement;
 
-    public isDebuggingEnabled: boolean = false;
+    public _isDebuggingEnabled: boolean = false;
 
     public constructor(hudId: string, debugId: string, errorId: string, toggleId: string) {
         this.HUD = this.getDomElement(hudId);
@@ -21,24 +21,29 @@ export class Debugger {
         this.error = this.getDomElement(errorId);
         this.toggleButton = this.getDomElement(toggleId);
         this.toggleButton.addEventListener('click', () => {
-            this.isDebuggingEnabled = !this.isDebuggingEnabled;
+            this._isDebuggingEnabled = !this._isDebuggingEnabled;
 
-            this.toggleButton.innerHTML = this.isDebuggingEnabled ? 'Hide Debugging' : 'Show Debugging';
+            this.toggleButton.innerHTML = this._isDebuggingEnabled ? 'Hide Debugging' : 'Show Debugging';
 
-            if (!this.isDebuggingEnabled) {
-                this.debug.innerHTML = ''
+            if (!this._isDebuggingEnabled) {
+                this.debug.innerHTML = '';
             }
         });
+        this.toggleButton.innerHTML = 'Show Debugging';
     }
 
-    public renderHUD(point: Point3D, fov: number, near: number, far: number): void {
+    public get isDebuggingEnabled(): boolean {
+        return this._isDebuggingEnabled;
+    }
+
+    public renderHUD(eye: Point3D, fov: number, near: number, far: number): void {
         const format = (n: number): string => n.toFixed(2);
 
-        this.HUD.textContent = `(${format(point.x)}, ${format(point.y)}, ${format(point.z)}, ${fov}°, ${near}, ${far}})`;
+        this.HUD.textContent = `(${format(eye.x)}, ${format(eye.y)}, ${format(eye.z)}, ${fov}°, ${near}, ${far})`;
     }
 
-    public renderInputFeedInfo(isDragging: boolean, touchDistance: number, mousePosition: Point2D): void {
-        if (!this.isDebuggingEnabled) {
+    public renderInputInfo(isDragging: boolean, touchDistance: number, mousePosition: Point2D): void {
+        if (!this._isDebuggingEnabled) {
             return;
         }
 
@@ -46,7 +51,7 @@ export class Debugger {
     }
 
     public renderMatrices(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4): void {
-        if (!this.isDebuggingEnabled) {
+        if (!this._isDebuggingEnabled) {
             return;
         }
 

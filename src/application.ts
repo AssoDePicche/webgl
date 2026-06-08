@@ -1,12 +1,31 @@
 import * as glMatrix from 'gl-matrix';
 
+import { Camera } from './camera.js';
+
+import { Debugger } from './debugger.js';
+
 import * as Cube from './cube.js';
 
+import { Input } from './input.js';
+
 import { Mesh } from './mesh.js';
+
+import { Point3D } from './point.js';
 
 import { Program } from './program.js';
 
 import { Texture } from './texture.js';
+
+import { clamp, deg2Rad } from './utils.js';
+
+interface Inputs {
+    coordsX: HTMLInputElement;
+    coordsY: HTMLInputElement;
+    coordsZ: HTMLInputElement;
+    fov: HTMLInputElement;
+    near: HTMLInputElement;
+    far: HTMLInputElement;
+}
 
 export class Application {
     private context: WebGLRenderingContext;
@@ -17,8 +36,37 @@ export class Application {
 
     private texture: Texture;
 
+    private camera: Camera;
+
+    private debugger: Debugger;
+
+    private input: Input;
+
+    private inputs: Inputs;
+
     public constructor(canvasId: string, vertexSource: string, fragmentSource: string, textureSource: string) {
         this.context = this.getGraphicsContext(canvasId);
+
+        this.camera = new Camera({
+            minRadius: 1.5,
+            maxRadius: 20.0,
+            moveSpeed: 0.5,
+            sensitivity: 0.1,
+            zoomSpeed: 0.5,
+        });
+
+        this.debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
+
+        this.input = new Input(this.context.canvas! as HTMLCanvasElement);
+
+        this.inputs = {
+            coordsX: document.getElementById('angleX') as HTMLInputElement,
+            coordsY: document.getElementById('angleY') as HTMLInputElement,
+            coordsZ: document.getElementById('angleZ') as HTMLInputElement,
+            fov: document.getElementById('fieldOfView') as HTMLInputElement,
+            near: document.getElementById('nearBound') as HTMLInputElement,
+            far: document.getElementById('farBound') as HTMLInputElement,
+        };
 
         this.resizeCanvasToDisplaySize(window.devicePixelRatio);
 
@@ -39,7 +87,9 @@ export class Application {
         this.texture.bind(textureCoordinates, 2, Cube.CUBE_GEOMETRY.STRIDE, 3);
     }
 
-    public render() {
+    public render = (): void => {
+        this.camera.update(this.input);
+
         this.context.clearColor(0.0, 0.0, 0.0, 1.0);
 
         this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
@@ -48,7 +98,7 @@ export class Application {
 
         const aspectRatio: number = (this.context.canvas as HTMLCanvasElement).width / (this.context.canvas as HTMLCanvasElement).height;
 
-        const eye: number[] = [0.0, 0.0, 2.0];
+        const eye: Point3D = this.camera.getEyePosition();
 
         const at: number[] = [0.0, 0.0, 0.0];
 
@@ -56,9 +106,29 @@ export class Application {
 
         const viewMatrix: glMatrix.mat4 = glMatrix.mat4.identity(new Float32Array(16));
 
-        glMatrix.mat4.lookAt(viewMatrix, eye, at, up);
+        glMatrix.mat4.lookAt(viewMatrix, eye.toArray(), at, up);
 
-        const projectionMatrix: glMatrix.mat4 = glMatrix.mat4.perspective(new Float32Array(16), 60, aspectRatio, 1, 1000);
+        const fovDegrees = parseFloat(this.inputs.fov.value);
+
+        const near = parseFloat(this.inputs.near.value);
+
+        const far = parseFloat(this.inputs.far.value);
+
+        const angleX = parseFloat(this.inputs.coordsX.value);
+
+        const angleY = parseFloat(this.inputs.coordsY.value);
+
+        const angleZ = parseFloat(this.inputs.coordsZ.value);
+
+        const projectionMatrix: glMatrix.mat4 = glMatrix.mat4.perspective(new Float32Array(16), deg2Rad(fovDegrees), aspectRatio, near, far);
+
+        glMatrix.mat4.identity(worldMatrix);
+
+        glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleX, [1, 0, 0]);
+
+        glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleY, [0, 1, 0]);
+
+        glMatrix.mat4.rotate(worldMatrix, worldMatrix, angleZ, [0, 0, 1]);
 
         this.setUniformMatrix4fv('mWorld', worldMatrix);
 
@@ -66,9 +136,19 @@ export class Application {
 
         this.setUniformMatrix4fv('mProjection', projectionMatrix);
 
+        this.debugger.renderHUD(eye, fovDegrees, near, far);
+
+        if (this.debugger.isDebuggingEnabled) {
+            this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
+
+            this.debugger.renderMatrices(worldMatrix, viewMatrix, projectionMatrix);
+        }
+
         this.texture.activate();
 
         this.mesh.draw(Cube.indices.length, this.context.UNSIGNED_SHORT);
+
+        this.input.flush();
 
         requestAnimationFrame(() => this.render());
     }

@@ -24,6 +24,10 @@ export abstract class Point {
 
         return Math.sqrt(dx * dx + dy * dy);
     }
+
+    public toArray(): number[] {
+        return [this._x, this._y];
+    }
 }
 
 export class Point2D extends Point {
@@ -53,5 +57,9 @@ export class Point3D extends Point2D {
         const dz: number = this.z - point.z;
 
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    public toArray(): number[] {
+        return [this.x, this.y, this._z];
     }
 }
