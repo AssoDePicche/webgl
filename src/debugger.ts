@@ -36,10 +36,24 @@ export class Debugger {
         return this._isDebuggingEnabled;
     }
 
-    public renderHUD(eye: Point3D, fov: number, near: number, far: number): void {
+    public renderHUD(eye: Point3D, at: Point3D, up: Point3D, fov: number, near: number, far: number): void {
         const format = (n: number): string => n.toFixed(2);
 
-        this.HUD.textContent = `(${format(eye.x)}, ${format(eye.y)}, ${format(eye.z)}, ${fov}°, ${near}, ${far})`;
+        const formatPoint = (p: Point3D): string => `(${format(p.x)}, ${format(p.y)}, ${format(p.z)})`;
+
+        this.HUD.textContent = '';
+
+        this.HUD.textContent += `Eye = ${formatPoint(eye)}\n`;
+
+        this.HUD.textContent += `At = ${formatPoint(at)}\n`;
+
+        this.HUD.textContent += `Up = ${formatPoint(up)}\n`;
+
+        this.HUD.textContent += `FOV: ${fov}\n`;
+
+        this.HUD.textContent += `Near: ${near}\n`;
+
+        this.HUD.textContent += `Far: ${far}\n`;
     }
 
     public renderInputInfo(isDragging: boolean, touchDistance: number, mousePosition: Point2D): void {

@@ -39,6 +39,7 @@ body {
 
 #HUD {
   font-size: 1.8rem;
+  white-space: pre-wrap;
 }
 
 #DEBUG {

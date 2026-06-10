@@ -3,6 +3,18 @@ import { Point2D } from './point.js';
 export class Input {
     private canvas: HTMLCanvasElement;
 
+    private coordsX: HTMLInputElement;
+
+    private coordsY: HTMLInputElement;
+
+    private coordsZ: HTMLInputElement;
+
+    private fov: HTMLInputElement;
+
+    private near: HTMLInputElement;
+
+    private far: HTMLInputElement;
+
     private keys: Record<string, boolean> = {
         w: false,
         a: false,
@@ -24,6 +36,18 @@ export class Input {
 
     public constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
+
+        this.coordsX = this.getSlider('angleX');
+
+        this.coordsY = this.getSlider('angleY');
+
+        this.coordsZ = this.getSlider('angleZ');
+
+        this.fov = this.getSlider('fieldOfView');
+
+        this.near = this.getSlider('nearBound');
+
+        this.far = this.getSlider('farBound');
 
         this.attachListeners();
     }
@@ -50,6 +74,34 @@ export class Input {
 
     public get lastTouchDistance(): number {
         return this._lastTouchDistance;
+    }
+
+    public get rotations(): [number, number, number] {
+        return [
+            parseFloat(this.coordsX.value),
+            parseFloat(this.coordsY.value),
+            parseFloat(this.coordsZ.value)
+        ];
+    }
+
+    public get fieldOfViewDegrees(): number {
+        return parseFloat(this.fov.value);
+    }
+
+    public get nearBounds(): number {
+        return parseFloat(this.near.value);
+    }
+
+    public get farBounds(): number {
+        return parseFloat(this.far.value);
+    }
+
+    private getSlider(id: string): HTMLInputElement {
+        const element = document.getElementById(id);
+
+        if (!element) throw new Error(`Slider Input Element #${id} was not found in DOM.`);
+
+        return element as HTMLInputElement;
     }
 
     private attachListeners(): void {

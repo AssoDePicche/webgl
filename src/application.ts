@@ -12,62 +12,6 @@ import { Point3D } from './point.js';
 
 import { deg2Rad } from './utils.js';
 
-class ApplicationInput {
-    private coordsX: HTMLInputElement;
-
-    private coordsY: HTMLInputElement;
-
-    private coordsZ: HTMLInputElement;
-
-    private fov: HTMLInputElement;
-
-    private near: HTMLInputElement;
-
-    private far: HTMLInputElement;
-
-    public constructor() {
-        this.coordsX = this.getSlider('angleX');
-
-        this.coordsY = this.getSlider('angleY');
-
-        this.coordsZ = this.getSlider('angleZ');
-
-        this.fov = this.getSlider('fieldOfView');
-
-        this.near = this.getSlider('nearBound');
-
-        this.far = this.getSlider('farBound');
-    }
-
-    private getSlider(id: string): HTMLInputElement {
-        const element = document.getElementById(id);
-
-        if (!element) throw new Error(`Slider Input Element #${id} was not found in DOM.`);
-
-        return element as HTMLInputElement;
-    }
-
-    public get rotations(): [number, number, number] {
-        return [
-            parseFloat(this.coordsX.value),
-            parseFloat(this.coordsY.value),
-            parseFloat(this.coordsZ.value)
-        ];
-    }
-
-    public get fieldOfViewDegrees(): number {
-        return parseFloat(this.fov.value);
-    }
-
-    public get nearBounds(): number {
-        return parseFloat(this.near.value);
-    }
-
-    public get farBounds(): number {
-        return parseFloat(this.far.value);
-    }
-}
-
 export class Application {
     private context: Context;
 
@@ -83,8 +27,6 @@ export class Application {
     });
 
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
-
-    private appInput: ApplicationInput = new ApplicationInput();
 
     private worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
@@ -103,19 +45,19 @@ export class Application {
 
         const eye: Point3D = this.camera.getEyePosition();
 
-        const at: number[] = [0.0, 0.0, 0.0];
+        const at: Point3D = new Point3D(0.0, 0.0, 0.0);
 
-        const up: number[] = [0.0, 1.0, 0.0];
+        const up: Point3D = new Point3D(0.0, 1.0, 0.0);
 
-        const [angleX, angleY, angleZ] = this.appInput.rotations;
+        const [angleX, angleY, angleZ] = this.input.rotations;
 
-        const fovDegrees: number = this.appInput.fieldOfViewDegrees;
+        const fovDegrees: number = this.input.fieldOfViewDegrees;
 
-        const near: number = this.appInput.nearBounds;
+        const near: number = this.input.nearBounds;
 
-        const far: number = this.appInput.farBounds;
+        const far: number = this.input.farBounds;
 
-        glMatrix.mat4.lookAt(this.viewMatrix, eye.toArray(), at, up);
+        glMatrix.mat4.lookAt(this.viewMatrix, eye.toArray(), at.toArray(), up.toArray());
 
         glMatrix.mat4.perspective(this.projectionMatrix, deg2Rad(fovDegrees), this.context.aspectRatio, near, far);
 
@@ -131,7 +73,7 @@ export class Application {
 
         this.context.draw(this.worldMatrix, this.viewMatrix, this.projectionMatrix);
 
-        this.debugger.renderHUD(eye, fovDegrees, near, far);
+        this.debugger.renderHUD(eye, at, up, fovDegrees, near, far);
 
         if (this.debugger.isDebuggingEnabled) {
             this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
