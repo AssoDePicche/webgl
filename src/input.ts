@@ -1,5 +1,42 @@
 import { Point2D } from './point.js';
 
+class KeyboardInput {
+    private keys: Record<string, boolean> = {
+        w: false,
+        a: false,
+        s: false,
+        d: false,
+    };
+
+    public constructor() {
+        const onKeyDown = (event: KeyboardEvent) => {
+            this.setKey(event, true);
+        };
+
+        const onKeyUp = (event: KeyboardEvent) => {
+            this.setKey(event, false);
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+
+        window.addEventListener('keyup', onKeyUp);
+    }
+
+    public isKeyPressed(key: string): boolean {
+        return !!this.keys[key.toLowerCase()];
+    }
+
+    private setKey(event: KeyboardEvent, isPressed: boolean): void {
+        const key: string = event.key.toLowerCase();
+
+        if (key in this.keys) {
+            event.preventDefault();
+
+            this.keys[key] = isPressed;
+        }
+    }
+}
+
 export class Input {
     private canvas: HTMLCanvasElement;
 
@@ -15,13 +52,6 @@ export class Input {
 
     private far: HTMLInputElement;
 
-    private keys: Record<string, boolean> = {
-        w: false,
-        a: false,
-        s: false,
-        d: false,
-    };
-
     private _isDragging: boolean = false;
 
     private _lastTouchDistance: number = 0;
@@ -33,6 +63,8 @@ export class Input {
     private _deltaY: number = 0;
 
     private _deltaZoom: number = 0;
+
+    private keyboard: KeyboardInput = new KeyboardInput();;
 
     public constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -105,8 +137,6 @@ export class Input {
     }
 
     private attachListeners(): void {
-        window.addEventListener('keydown', this.handleKeyDown);
-        window.addEventListener('keyup', this.handleKeyUp);
         window.addEventListener('mouseup', this.handleMouseUp);
 
         this.canvas.addEventListener('mousedown', this.handleMouseDown);
@@ -118,22 +148,8 @@ export class Input {
         this.canvas.addEventListener('wheel', this.handleMouseWheel, { passive: false });
     }
 
-    private handleKeyDown = (event: KeyboardEvent) => this.setKey(event, true);
-
-    private handleKeyUp = (event: KeyboardEvent) => this.setKey(event, false);
-
-    private setKey(event: KeyboardEvent, isPressed: boolean): void {
-        const key: string = event.key.toLowerCase();
-
-        if (key in this.keys) {
-            event.preventDefault();
-
-            this.keys[key] = isPressed;
-        }
-    }
-
     public isKeyPressed(key: string): boolean {
-        return !!this.keys[key.toLowerCase()];
+        return this.keyboard.isKeyPressed(key);
     }
 
     private handleMouseDown = (event: MouseEvent) => {
