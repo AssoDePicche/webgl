@@ -1,25 +1,15 @@
 import * as glMatrix from 'gl-matrix';
 
-import { Cube } from './cube.js';
-
 import { Entity } from './entity.js';
 
 import { PointLight } from './light.js';
 
-import { Mesh } from './mesh.js';
-
 import { Program } from './program.js';
-
-import { Texture } from './texture.js';
 
 export class Context {
     public readonly context: WebGLRenderingContext;;
 
-    public readonly mesh: Mesh;
-
     public readonly program: Program;
-
-    public readonly texture: Texture;
 
     private worldLocation!: WebGLUniformLocation | null;
 
@@ -33,18 +23,12 @@ export class Context {
 
     private lightPositionLocation!: WebGLUniformLocation | null;
 
-    public constructor(canvasId: string, vertexSource: string, fragmentSource: string, textureSource: string) {
+    public constructor(canvasId: string, vertexSource: string, fragmentSource: string) {
         this.context = this.getGraphicsContext(canvasId);
 
         this.resizeCanvasToDisplaySize(window.devicePixelRatio);
 
-        this.mesh = new Mesh(this.context, Cube.indices, Cube.vertices);
-
         this.program = new Program(this.context, vertexSource, fragmentSource);
-
-        this.texture = new Texture(this.context, textureSource);
-
-        this.program.use();
 
         this.worldLocation = this.program.getUniformLocation('u_World');
 
@@ -57,14 +41,6 @@ export class Context {
         this.lightColorLocation = this.program.getUniformLocation('u_LightColor');
 
         this.lightPositionLocation = this.program.getUniformLocation('u_LightPosition');
-
-        const aPosition: number = this.program.getAttribLocation('aPosition');
-
-        this.mesh.bind(aPosition, 3, Cube.STRIDE);
-
-        const aTextureCoordinates: number = this.program.getAttribLocation('aTextureCoordinates');
-
-        this.texture.bind(aTextureCoordinates, 2, Cube.STRIDE, 3);
     }
 
     public clear(): void {
@@ -88,9 +64,15 @@ export class Context {
 
         this.context.uniform3fv(this.lightPositionLocation, light.position.toArray());
 
-        this.texture.activate();
+        const aPosition = entity.material.program.getAttribLocation('aPosition');
 
-        this.mesh.draw(Cube.indices.length, this.context.UNSIGNED_SHORT, 0);
+        const aTextureCoordinates = entity.material.program.getAttribLocation('aTextureCoordinates');
+
+        entity.mesh.bind(aPosition, 3, 5, 0);
+
+        entity.mesh.bind(aTextureCoordinates, 2, 5, 3);
+
+        entity.mesh.draw(this.context.UNSIGNED_SHORT, 0);
     }
 
     public get aspectRatio(): number {

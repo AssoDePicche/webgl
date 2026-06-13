@@ -1,12 +1,20 @@
 export class Mesh {
+    public readonly elementCount: number;
+
     private context: WebGLRenderingContext;
 
     private indexBuffer: WebGLBuffer;
 
     private vertexBuffer: WebGLBuffer;
 
-    constructor(context: WebGLRenderingContext, indices: Uint16Array, vertices: Float32Array) {
+    constructor(
+        context: WebGLRenderingContext,
+        indices: Uint16Array,
+        vertices: Float32Array,
+    ) {
         this.context = context;
+
+        this.elementCount = indices.length;
 
         this.indexBuffer = this.context.createBuffer();
 
@@ -36,9 +44,9 @@ export class Mesh {
         this.context.enableVertexAttribArray(attributeLocation);
     }
 
-    public draw(count: number, type: number, offset: number = 0): void {
+    public draw(type: number, offset: number = 0): void {
         this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-        this.context.drawElements(this.context.TRIANGLES, count, type, offset);
+        this.context.drawElements(this.context.TRIANGLES, this.elementCount, type, offset);
     }
 }

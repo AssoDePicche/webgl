@@ -2,15 +2,21 @@ import { Camera } from './camera.js';
 
 import { Context } from './context.js';
 
+import { Cube } from './cube.js';
+
 import { Debugger } from './debugger.js';
 
 import { Entity } from './entity.js';
 
 import { Material } from './material.js';
 
+import { Mesh } from './mesh.js';
+
 import { PointLight } from './light.js';
 
 import { Input } from './input.js';
+
+import { Texture } from './texture.js';
 
 import { Transform } from './transform.js';
 
@@ -25,7 +31,7 @@ export class Application {
 
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
 
-    private entity: Entity;
+    private cubeEntity: Entity;
 
     private light: PointLight;
 
@@ -42,9 +48,9 @@ export class Application {
             zoomSpeed: 0.5,
         });
 
-        this.entity = new Entity(
-            new Material(this.context.program),
-            this.context.mesh,
+        this.cubeEntity = new Entity(
+            new Material(this.context.program, new Texture(this.context.context, 'crate.svg')),
+            new Mesh(this.context.context, Cube.indices, Cube.vertices),
             new Transform()
         );
 
@@ -77,7 +83,7 @@ export class Application {
 
         this.context.clear();
 
-        this.context.draw(this.entity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
+        this.context.draw(this.cubeEntity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
 
