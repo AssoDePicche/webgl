@@ -12,6 +12,14 @@ class CubeFace {
         public readonly topLeft: Vertex,
     ) { }
 
+    public normal(): Vector3D {
+        const AB: Vector3D = Vector3D.from(this.bottomLeft.position, this.bottomRight.position);
+
+        const AC: Vector3D = Vector3D.from(this.bottomRight.position, this.topRight.position);
+
+        return AB.cross(AC).normalize();
+    }
+
     public reflect(planeNormal: Vector3D): CubeFace {
         return new CubeFace(
             this.bottomLeft.reflect(planeNormal),
@@ -22,11 +30,26 @@ class CubeFace {
     }
 
     public toArray(): number[] {
+        const normal: Vector3D = this.normal();
+
+        const flatVertexWithNormal = (vertex: Vertex): number[] => {
+            return [
+                vertex.position.x,
+                vertex.position.y,
+                vertex.position.z,
+                normal.x,
+                normal.y,
+                normal.z,
+                vertex.uv.x,
+                vertex.uv.y,
+            ];
+        };
+
         return [
-            ...this.bottomLeft.toArray(),
-            ...this.bottomRight.toArray(),
-            ...this.topRight.toArray(),
-            ...this.topLeft.toArray(),
+            ...flatVertexWithNormal(this.bottomLeft),
+            ...flatVertexWithNormal(this.bottomRight),
+            ...flatVertexWithNormal(this.topRight),
+            ...flatVertexWithNormal(this.topLeft),
         ].flat();
     }
 }
@@ -34,7 +57,7 @@ class CubeFace {
 export class Cube {
     public static readonly FACES: number = 6;
     public static readonly INDICES_PER_FACE: number = 6;
-    public static readonly STRIDE: number = 5;
+    public static readonly STRIDE: number = 8;
     public static readonly TOTAL_INDICES: number = 36;
     public static readonly TOTAL_VERTICES: number = 24;
     public static readonly VERTICES_PER_FACE: number = 4;

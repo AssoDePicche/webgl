@@ -23,6 +23,22 @@ export class Vector3D {
         return new Vector3D(point.x, point.y, point.z);
     }
 
+    public static from(a: Point3D, b: Point3D): Vector3D {
+        return new Vector3D(
+            b.x - a.x,
+            b.y - a.y,
+            b.z - a.z
+        );
+    }
+
+    public cross(vector: Vector3D): Vector3D {
+        return new Vector3D(
+            this.y * vector.z - this.z * vector.y,
+            this.z * vector.x - this.x * vector.z,
+            this.x * vector.y - this.y * vector.x
+        );
+    }
+
     public dot(vector: Vector3D): number {
         return this.x * vector.x + this.y * vector.y + this.z * vector.z;
     }

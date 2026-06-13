@@ -6,7 +6,7 @@ export class Sphere {
     ) { }
 
     public static createSphere(radius: number, latitudeBands: number, longitudeBands: number): Sphere {
-        const stride: number = 5;
+        const stride: number = 8;
 
         const vertices = [];
 
@@ -22,23 +22,18 @@ export class Sphere {
                 const sinPhi = Math.sin(phi);
                 const cosPhi = Math.cos(phi);
 
-                // Normal coordinates (x, y, z unit vector)
                 const nx = cosPhi * sinTheta;
                 const ny = cosTheta;
                 const nz = sinPhi * sinTheta;
 
-                // Position coordinates
                 const x = radius * nx;
                 const y = radius * ny;
                 const z = radius * nz;
 
-                // Texture coordinates (u, v)
                 const u = 1 - (longNumber / longitudeBands);
                 const v = 1 - (latNumber / latitudeBands);
 
-                // Push matching your interleaved layout structured like your Cube data:
-                // [pos.x, pos.y, pos.z, tex.u, tex.v]
-                vertices.push(x, y, z, u, v);
+                vertices.push(x, y, z, nx, ny, nz, u, v);
             }
         }
 

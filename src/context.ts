@@ -66,13 +66,17 @@ export class Context {
 
         this.context.uniformMatrix4fv(this.worldLocation, false, entity.world());
 
+        const aNormal = entity.material.program.getAttribLocation('aNormal');
+
         const aPosition = entity.material.program.getAttribLocation('aPosition');
 
         const aTextureCoordinates = entity.material.program.getAttribLocation('aTextureCoordinates');
 
-        entity.mesh.bind(aPosition, 3, 5, 0);
+        entity.mesh.bind(aNormal, 3, 8, 3);
 
-        entity.mesh.bind(aTextureCoordinates, 2, 5, 3);
+        entity.mesh.bind(aPosition, 3, 8, 0);
+
+        entity.mesh.bind(aTextureCoordinates, 2, 8, 6);
 
         entity.mesh.draw(this.context.UNSIGNED_SHORT, 0);
     }

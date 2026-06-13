@@ -1,5 +1,6 @@
 precision mediump float;
 
+attribute vec3 aNormal;
 attribute vec3 aPosition;
 attribute vec2 aTextureCoordinates;
 
@@ -16,7 +17,7 @@ void main() {
 
   v_WorldPosition = worldPosition.xyz;
     
-  v_Normal = normalize(mat3(u_World) * aPosition); 
+  v_Normal = normalize(mat3(u_World) * aNormal); 
 
   v_TextureCoordinates = aTextureCoordinates;
 
