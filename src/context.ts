@@ -1,6 +1,6 @@
 import * as glMatrix from 'gl-matrix';
 
-import * as Cube from './cube.js';
+import { Cube } from './cube.js';
 
 import { Mesh } from './mesh.js';
 
@@ -28,7 +28,7 @@ export class Context {
 
         this.resizeCanvasToDisplaySize(window.devicePixelRatio);
 
-        this.mesh = new Mesh(this.context, Cube.indices, new Float32Array(Cube.vertices));
+        this.mesh = new Mesh(this.context, Cube.indices, Cube.vertices);
 
         this.program = new Program(this.context, vertexSource, fragmentSource);
 
@@ -44,11 +44,11 @@ export class Context {
 
         const aPosition: number = this.program.getAttribLocation('aPosition');
 
-        this.mesh.bind(aPosition, 3, Cube.CUBE_GEOMETRY.STRIDE);
+        this.mesh.bind(aPosition, 3, Cube.STRIDE);
 
         const textureCoordinates: number = this.program.getAttribLocation('textureCoordinates');
 
-        this.texture.bind(textureCoordinates, 2, Cube.CUBE_GEOMETRY.STRIDE, 3);
+        this.texture.bind(textureCoordinates, 2, Cube.STRIDE, 3);
     }
 
     public clear(): void {

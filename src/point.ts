@@ -1,3 +1,5 @@
+import { Vector3D } from './vector.js';
+
 export abstract class Point {
     private _x: number;
 
@@ -37,6 +39,12 @@ export class Point2D extends Point {
 }
 
 export class Point3D extends Point2D {
+    public static readonly PLANE_XY_NORMAL: Vector3D = new Vector3D(0, 0, 1);
+
+    public static readonly PLANE_XZ_NORMAL: Vector3D = new Vector3D(0, 1, 0);
+
+    public static readonly PLANE_YZ_NORMAL: Vector3D = new Vector3D(1, 0, 0);
+
     private _z: number;
 
     public constructor(x: number, y: number, z: number) {
@@ -57,6 +65,18 @@ export class Point3D extends Point2D {
         const dz: number = this.z - point.z;
 
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    public reflect(planeNormal: Vector3D): Point3D {
+        const normal: Vector3D = planeNormal.normalize();
+
+        const dotProduct: number = Vector3D.of(this).dot(normal);
+
+        return new Point3D(
+            this.x - 2 * dotProduct * normal.x,
+            this.y - 2 * dotProduct * normal.y,
+            this.z - 2 * dotProduct * normal.z,
+        );
     }
 
     public toArray(): number[] {
