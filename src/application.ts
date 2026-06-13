@@ -16,6 +16,10 @@ import { PointLight } from './light.js';
 
 import { Input } from './input.js';
 
+import { Point3D } from './point.js';
+
+import { Sphere } from './sphere.js';
+
 import { Texture } from './texture.js';
 
 import { Transform } from './transform.js';
@@ -32,6 +36,8 @@ export class Application {
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
 
     private cubeEntity: Entity;
+
+    private sphereEntity: Entity;
 
     private light: PointLight;
 
@@ -52,6 +58,14 @@ export class Application {
             new Material(this.context.program, new Texture(this.context.context, 'crate.svg')),
             new Mesh(this.context.context, Cube.indices, Cube.vertices),
             new Transform()
+        );
+
+        const sphere: Sphere = Sphere.createSphere(1, 30, 30);
+
+        this.sphereEntity = new Entity(
+            new Material(this.context.program, new Texture(this.context.context, '')),
+            new Mesh(this.context.context, sphere.indices, sphere.vertices),
+            new Transform(new Point3D(-2, 0, 0))
         );
 
         this.light = new PointLight(
@@ -84,6 +98,8 @@ export class Application {
         this.context.clear();
 
         this.context.draw(this.cubeEntity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
+
+        this.context.draw(this.sphereEntity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
 
