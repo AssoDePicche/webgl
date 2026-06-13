@@ -35,9 +35,7 @@ export class Application {
 
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
 
-    private cubeEntity: Entity;
-
-    private sphereEntity: Entity;
+    private entities: Entity[] = [];
 
     private light: PointLight;
 
@@ -54,18 +52,24 @@ export class Application {
             zoomSpeed: 0.5,
         });
 
-        this.cubeEntity = new Entity(
-            new Material(this.context.program, new Texture(this.context.context, 'crate.svg')),
-            new Mesh(this.context.context, Cube.indices, Cube.vertices),
-            new Transform()
+        this.entities.push(
+            new Entity(
+                new Material(this.context.program, new Texture(this.context.context, 'crate.svg')),
+                new Mesh(this.context.context, Cube.indices, Cube.vertices),
+                new Transform()
+            )
         );
 
         const sphere: Sphere = Sphere.createSphere(1, 30, 30);
 
-        this.sphereEntity = new Entity(
-            new Material(this.context.program, new Texture(this.context.context, '')),
-            new Mesh(this.context.context, sphere.indices, sphere.vertices),
-            new Transform(new Point3D(-2, 0, 0))
+        const offset: Point3D = new Point3D(-3, 0, 0);
+
+        this.entities.push(
+            new Entity(
+                new Material(this.context.program, new Texture(this.context.context, '')),
+                new Mesh(this.context.context, sphere.indices, sphere.vertices),
+                new Transform(offset)
+            )
         );
 
         this.light = new PointLight(
@@ -97,9 +101,9 @@ export class Application {
 
         this.context.clear();
 
-        this.context.draw(this.cubeEntity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
-
-        this.context.draw(this.sphereEntity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
+        for (const entity of this.entities) {
+            this.context.draw(entity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
+        }
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
 
