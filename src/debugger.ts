@@ -36,7 +36,7 @@ export class Debugger {
         return this._isDebuggingEnabled;
     }
 
-    public renderHUD(eye: Point3D, at: Point3D, up: Point3D, fov: number, near: number, far: number): void {
+    public renderHUD(eye: Point3D, at: Point3D, up: Point3D, fov: number, near: number, far: number, light: Point3D): void {
         const format = (n: number): string => n.toFixed(2);
 
         const formatPoint = (p: Point3D): string => `(${format(p.x)}, ${format(p.y)}, ${format(p.z)})`;
@@ -54,6 +54,8 @@ export class Debugger {
         this.HUD.textContent += `Near: ${near}\n`;
 
         this.HUD.textContent += `Far: ${far}\n`;
+
+        this.HUD.textContent += `Light Position = ${formatPoint(light)}\n`;
     }
 
     public renderInputInfo(isDragging: boolean, touchDistance: number, mousePosition: Point2D): void {

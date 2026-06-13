@@ -82,7 +82,7 @@ export class Application {
             this.context.draw(entity);
         }
 
-        this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
+        this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far, this.light.position);
 
         if (this.debugger.isDebuggingEnabled) {
             this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
