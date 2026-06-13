@@ -2,27 +2,15 @@ import { Camera } from './camera.js';
 
 import { Context } from './context.js';
 
-import { Cube } from './cube.js';
-
 import { Debugger } from './debugger.js';
 
-import { Entity } from './entity.js';
-
-import { Material } from './material.js';
-
-import { Mesh } from './mesh.js';
+import { Entity, EntityFactory } from './entity.js';
 
 import { PointLight } from './light.js';
 
 import { Input } from './input.js';
 
 import { Point3D } from './point.js';
-
-import { Sphere } from './sphere.js';
-
-import { Texture } from './texture.js';
-
-import { Transform } from './transform.js';
 
 import { Vector3D } from './vector.js';
 
@@ -39,7 +27,7 @@ export class Application {
 
     private light: PointLight;
 
-    public constructor(context: Context) {
+    public constructor(context: Context, vertexSource: string, fragmentSource: string) {
         this.context = context;
 
         this.input = new Input(this.context.canvas);
@@ -52,24 +40,11 @@ export class Application {
             zoomSpeed: 0.5,
         });
 
-        this.entities.push(
-            new Entity(
-                new Material(this.context.program, new Texture(this.context.context, 'crate.svg')),
-                new Mesh(this.context.context, Cube.indices, Cube.vertices),
-                new Transform()
-            )
-        );
-
-        const sphere: Sphere = Sphere.createSphere(1, 30, 30);
-
-        const offset: Point3D = new Point3D(-3, 0, 0);
+        const factory: EntityFactory = new EntityFactory(this.context);
 
         this.entities.push(
-            new Entity(
-                new Material(this.context.program, new Texture(this.context.context, '')),
-                new Mesh(this.context.context, sphere.indices, sphere.vertices),
-                new Transform(offset)
-            )
+            factory.createCube('crate.svg'),
+            factory.createSphere('', new Point3D(-3, 0, 0)),
         );
 
         this.light = new PointLight(

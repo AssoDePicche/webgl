@@ -11,7 +11,7 @@ const fragmentShaderSourceCode: string = await getFileContents('fragment.glsl');
 try {
     const context: Context = new Context('canvas', vertexShaderSourceCode, fragmentShaderSourceCode);
 
-    const application: Application = new Application(context);
+    const application: Application = new Application(context, vertexShaderSourceCode, fragmentShaderSourceCode);
 
     requestAnimationFrame((time: number) => application.render(time));
 } catch (exception: unknown) {
