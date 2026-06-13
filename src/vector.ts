@@ -34,4 +34,8 @@ export class Vector3D {
 
         return new Vector3D(this.x / this.length, this.y / this.length, this.z / this.length);
     }
+
+    public toArray(): number[] {
+        return [this.x, this.y, this.z];
+    }
 }

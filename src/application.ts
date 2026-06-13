@@ -4,9 +4,11 @@ import { Context } from './context.js';
 
 import { Debugger } from './debugger.js';
 
+import { PointLight } from './light.js';
+
 import { Input } from './input.js';
 
-import { Point3D } from './point.js';
+import { Vector3D } from './vector.js';
 
 export class Application {
     private context: Context;
@@ -17,9 +19,7 @@ export class Application {
 
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
 
-    private radius: number = 5.0;
-
-    private speed: number = 0.0025;
+    private light: PointLight;
 
     public constructor(context: Context) {
         this.context = context;
@@ -33,6 +33,14 @@ export class Application {
             sensitivity: 0.1,
             zoomSpeed: 0.5,
         });
+
+        this.light = new PointLight(
+            2,
+            3,
+            0.002,
+            { red: 1, green: 1, blue: 1, alpha: 1 },
+            new Vector3D(.75, 0.09, 0.032)
+        );
     }
 
     public render = (time: number): void => {
@@ -46,13 +54,7 @@ export class Application {
 
         const far: number = this.input.farBounds;
 
-        const theta: number = time * this.speed;
-
-        const lightPosition: Point3D = new Point3D(
-            Math.sin(theta) * this.radius,
-            2.0,
-            Math.cos(theta) * this.radius
-        );
+        this.light.update(time);
 
         this.camera.lookAt(fovDegrees, this.context.aspectRatio, near, far);
 
@@ -60,7 +62,7 @@ export class Application {
 
         this.context.clear();
 
-        this.context.draw(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix, lightPosition);
+        this.context.draw(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
 

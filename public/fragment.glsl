@@ -5,14 +5,13 @@ varying vec3 v_WorldPosition;
 varying vec3 v_Normal;
 
 uniform sampler2D u_Texture;
+
+uniform vec3 u_LightAttenuation;
+uniform vec3 u_LightColor;
 uniform vec3 u_LightPosition;
 
 void main() {
     vec3 uAmbientColor = vec3(.15, .15, .15);
-
-    vec3 uLightColor = vec3(1, 1, 1);
-
-    vec3 uAttenuation = vec3(1, 0.09, 0.032);
 
     vec4 textureColor = texture2D(u_Texture, v_TextureCoordinates);
     
@@ -26,9 +25,9 @@ void main() {
 
     float diffuseIntensity = max(dot(normal, lightDirection), 0.0);
 
-    float attenuation = 1.0 / (uAttenuation.x + uAttenuation.y * distance + uAttenuation.z * (distance * distance));
+    float attenuation = 1.0 / (u_LightAttenuation.x + u_LightAttenuation.y * distance + u_LightAttenuation.z * (distance * distance));
     
-    vec3 diffuseLight = uLightColor * diffuseIntensity * attenuation;
+    vec3 diffuseLight = u_LightColor * diffuseIntensity * attenuation;
 
     vec3 finalLight = uAmbientColor + diffuseLight;
     

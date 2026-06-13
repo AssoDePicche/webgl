@@ -2,6 +2,8 @@ import * as glMatrix from 'gl-matrix';
 
 import { Cube } from './cube.js';
 
+import { PointLight } from './light.js';
+
 import { Mesh } from './mesh.js';
 
 import { Point3D } from './point.js';
@@ -25,6 +27,10 @@ export class Context {
 
     private projectionLocation!: WebGLUniformLocation | null;
 
+    private lightAttenuationLocation!: WebGLUniformLocation | null;
+
+    private lightColorLocation!: WebGLUniformLocation | null;
+
     private lightPositionLocation!: WebGLUniformLocation | null;
 
     public constructor(canvasId: string, vertexSource: string, fragmentSource: string, textureSource: string) {
@@ -46,6 +52,10 @@ export class Context {
 
         this.projectionLocation = this.program.getUniformLocation('u_Projection');
 
+        this.lightAttenuationLocation = this.program.getUniformLocation('u_LightAttenuation');
+
+        this.lightColorLocation = this.program.getUniformLocation('u_LightColor');
+
         this.lightPositionLocation = this.program.getUniformLocation('u_LightPosition');
 
         const aPosition: number = this.program.getAttribLocation('aPosition');
@@ -63,13 +73,21 @@ export class Context {
         this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
     }
 
-    public draw(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4, lightPosition: Point3D): void {
+    public draw(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4, light: PointLight): void {
         this.context.uniformMatrix4fv(this.worldLocation, false, world);
+
         this.context.uniformMatrix4fv(this.viewLocation, false, view);
+
         this.context.uniformMatrix4fv(this.projectionLocation, false, projection);
-        this.context.uniform3fv(this.lightPositionLocation, lightPosition.toArray());
+
+        this.context.uniform3fv(this.lightAttenuationLocation, light.attenuation.toArray());
+
+        this.context.uniform3fv(this.lightColorLocation, [light.color.red, light.color.green, light.color.blue]);
+
+        this.context.uniform3fv(this.lightPositionLocation, light.position.toArray());
 
         this.texture.activate();
+
         this.mesh.draw(Cube.indices.length, this.context.UNSIGNED_SHORT, 0);
     }
 
