@@ -6,6 +6,8 @@ import { Debugger } from './debugger.js';
 
 import { Input } from './input.js';
 
+import { Point3D } from './point.js';
+
 export class Application {
     private context: Context;
 
@@ -14,6 +16,10 @@ export class Application {
     private camera: Camera;
 
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
+
+    private radius: number = 5.0;
+
+    private speed: number = 0.0025;
 
     public constructor(context: Context) {
         this.context = context;
@@ -29,7 +35,7 @@ export class Application {
         });
     }
 
-    public render = (): void => {
+    public render = (time: number): void => {
         this.camera.update(this.input);
 
         const [roll, pitch, yaw] = this.input.rotations;
@@ -40,13 +46,21 @@ export class Application {
 
         const far: number = this.input.farBounds;
 
+        const theta: number = time * this.speed;
+
+        const lightPosition: Point3D = new Point3D(
+            Math.sin(theta) * this.radius,
+            2.0,
+            Math.cos(theta) * this.radius
+        );
+
         this.camera.lookAt(fovDegrees, this.context.aspectRatio, near, far);
 
         this.camera.rotate(roll, pitch, yaw);
 
         this.context.clear();
 
-        this.context.draw(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix);
+        this.context.draw(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix, lightPosition);
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
 
@@ -58,7 +72,7 @@ export class Application {
 
         this.input.flush();
 
-        requestAnimationFrame(() => this.render());
+        requestAnimationFrame((time: number) => this.render(time));
     }
 }
 

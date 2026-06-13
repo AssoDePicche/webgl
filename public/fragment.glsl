@@ -5,6 +5,7 @@ varying vec3 v_WorldPosition;
 varying vec3 v_Normal;
 
 uniform sampler2D u_Texture;
+uniform vec3 u_LightPosition;
 
 void main() {
     vec3 uAmbientColor = vec3(.15, .15, .15);
@@ -13,11 +14,9 @@ void main() {
 
     vec3 uAttenuation = vec3(1, 0.09, 0.032);
 
-    vec3 uLightPosition = vec3(0, 2, 3);
-
     vec4 textureColor = texture2D(u_Texture, v_TextureCoordinates);
     
-    vec3 lightVector = uLightPosition - v_WorldPosition;
+    vec3 lightVector = u_LightPosition - v_WorldPosition;
     
     float distance = length(lightVector);
 

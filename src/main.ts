@@ -15,7 +15,7 @@ try {
 
     const application: Application = new Application(context);
 
-    requestAnimationFrame(() => application.render());
+    requestAnimationFrame((time: number) => application.render(time));
 } catch (exception: unknown) {
     console.error(exception);
 }

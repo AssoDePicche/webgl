@@ -4,6 +4,8 @@ import { Cube } from './cube.js';
 
 import { Mesh } from './mesh.js';
 
+import { Point3D } from './point.js';
+
 import { Program } from './program.js';
 
 import { Texture } from './texture.js';
@@ -22,6 +24,8 @@ export class Context {
     private viewLocation!: WebGLUniformLocation | null;
 
     private projectionLocation!: WebGLUniformLocation | null;
+
+    private lightPositionLocation!: WebGLUniformLocation | null;
 
     public constructor(canvasId: string, vertexSource: string, fragmentSource: string, textureSource: string) {
         this.context = this.getGraphicsContext(canvasId);
@@ -42,6 +46,8 @@ export class Context {
 
         this.projectionLocation = this.program.getUniformLocation('u_Projection');
 
+        this.lightPositionLocation = this.program.getUniformLocation('u_LightPosition');
+
         const aPosition: number = this.program.getAttribLocation('aPosition');
 
         this.mesh.bind(aPosition, 3, Cube.STRIDE);
@@ -57,10 +63,11 @@ export class Context {
         this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
     }
 
-    public draw(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4): void {
+    public draw(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4, lightPosition: Point3D): void {
         this.context.uniformMatrix4fv(this.worldLocation, false, world);
         this.context.uniformMatrix4fv(this.viewLocation, false, view);
         this.context.uniformMatrix4fv(this.projectionLocation, false, projection);
+        this.context.uniform3fv(this.lightPositionLocation, lightPosition.toArray());
 
         this.texture.activate();
         this.mesh.draw(Cube.indices.length, this.context.UNSIGNED_SHORT, 0);
