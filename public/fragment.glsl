@@ -1,10 +1,10 @@
 precision mediump float;
 
-varying vec2 fragTextureCoord;
-varying vec3 vWorldPosition;
-varying vec3 vNormal;
+varying vec2 v_TextureCoordinates;
+varying vec3 v_WorldPosition;
+varying vec3 v_Normal;
 
-uniform sampler2D uTexture;
+uniform sampler2D u_Texture;
 
 void main() {
     vec3 uAmbientColor = vec3(.15, .15, .15);
@@ -15,15 +15,15 @@ void main() {
 
     vec3 uLightPosition = vec3(0, 2, 3);
 
-    vec4 textureColor = texture2D(uTexture, fragTextureCoord);
+    vec4 textureColor = texture2D(u_Texture, v_TextureCoordinates);
     
-    vec3 lightVector = uLightPosition - vWorldPosition;
+    vec3 lightVector = uLightPosition - v_WorldPosition;
     
     float distance = length(lightVector);
 
     vec3 lightDirection = normalize(lightVector);
     
-    vec3 normal = normalize(vNormal);
+    vec3 normal = normalize(v_Normal);
 
     float diffuseIntensity = max(dot(normal, lightDirection), 0.0);
 

@@ -36,19 +36,19 @@ export class Context {
 
         this.program.use();
 
-        this.worldLocation = this.program.getUniformLocation('mWorld');
+        this.worldLocation = this.program.getUniformLocation('u_World');
 
-        this.viewLocation = this.program.getUniformLocation('mView');
+        this.viewLocation = this.program.getUniformLocation('u_View');
 
-        this.projectionLocation = this.program.getUniformLocation('mProjection');
+        this.projectionLocation = this.program.getUniformLocation('u_Projection');
 
         const aPosition: number = this.program.getAttribLocation('aPosition');
 
         this.mesh.bind(aPosition, 3, Cube.STRIDE);
 
-        const textureCoordinates: number = this.program.getAttribLocation('textureCoordinates');
+        const aTextureCoordinates: number = this.program.getAttribLocation('aTextureCoordinates');
 
-        this.texture.bind(textureCoordinates, 2, Cube.STRIDE, 3);
+        this.texture.bind(aTextureCoordinates, 2, Cube.STRIDE, 3);
     }
 
     public clear(): void {
