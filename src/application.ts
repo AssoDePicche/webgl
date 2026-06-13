@@ -1,5 +1,3 @@
-import * as glMatrix from 'gl-matrix';
-
 import { Camera } from './camera.js';
 
 import { Context } from './context.js';
