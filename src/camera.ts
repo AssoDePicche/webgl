@@ -1,3 +1,5 @@
+import * as glMatrix from 'gl-matrix';
+
 import { Input } from './input.js';
 
 import { Point3D } from './point.js';
@@ -27,6 +29,12 @@ export class Camera {
     private settings: CameraSettings;
 
     private bounds: number = Math.PI / 2.1;
+
+    private _worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
+
+    private _viewMatrix = glMatrix.mat4.identity(new Float32Array(16));
+
+    private _projectionMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
     private keyInputEvents: KeyInputEvent[] = [
         {
@@ -75,11 +83,47 @@ export class Camera {
         this.radius = clamp(this.radius, this.settings.minRadius, this.settings.maxRadius);
     }
 
-    public getEyePosition(): Point3D {
+    public get eye(): Point3D {
         return new Point3D(
             this.radius * Math.cos(this.phi) * Math.sin(this.theta),
             this.radius * Math.sin(this.phi),
             this.radius * Math.cos(this.phi) * Math.cos(this.theta)
         );
+    }
+
+    public get at(): Point3D {
+        return new Point3D(0.0, 0.0, 0.0);
+    }
+
+    public get up(): Point3D {
+        return new Point3D(0.0, 1.0, 0.0);
+    }
+
+    public get projectionMatrix(): glMatrix.mat4 {
+        return this._projectionMatrix;
+    }
+
+    public get viewMatrix(): glMatrix.mat4 {
+        return this._viewMatrix;
+    }
+
+    public get worldMatrix(): glMatrix.mat4 {
+        return this._worldMatrix;
+    }
+
+    public lookAt(fovDegrees: number, aspectRatio: number, near: number, far: number): void {
+        glMatrix.mat4.lookAt(this._viewMatrix, this.eye.toArray(), this.at.toArray(), this.up.toArray());
+
+        glMatrix.mat4.perspective(this._projectionMatrix, deg2Rad(fovDegrees), aspectRatio, near, far);
+    }
+
+    public rotate(roll: number, pitch: number, yaw: number): void {
+        glMatrix.mat4.identity(this._worldMatrix);
+
+        glMatrix.mat4.rotate(this._worldMatrix, this._worldMatrix, roll, [1, 0, 0]);
+
+        glMatrix.mat4.rotate(this._worldMatrix, this._worldMatrix, pitch, [0, 1, 0]);
+
+        glMatrix.mat4.rotate(this._worldMatrix, this._worldMatrix, yaw, [0, 0, 1]);
     }
 }
