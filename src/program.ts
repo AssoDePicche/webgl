@@ -3,14 +3,26 @@ export class Program {
 
     private program: WebGLProgram;
 
+    private uniformsCache: Map<string, WebGLUniformLocation> = new Map<string, WebGLUniformLocation>();
+
     public constructor(context: WebGLRenderingContext, vertexSource: string, fragmentSource: string) {
         this.context = context;
 
         this.program = this.createProgram(vertexSource, fragmentSource);
     }
 
-    public getUniformLocation(name: string): WebGLUniformLocation | null {
-        return this.context.getUniformLocation(this.program, name);
+    public getUniformLocation(name: string): WebGLUniformLocation {
+        if (!this.uniformsCache.has(name)) {
+            const location: WebGLUniformLocation | null = this.context.getUniformLocation(this.program, name);
+
+            if (!location) {
+                throw Error(`Uniform '${name}' Not Found`);
+            }
+
+            this.uniformsCache.set(name, location);
+        }
+
+        return this.uniformsCache.get(name)!;
     }
 
     public setUniformMatrix4(name: string, matrix: number[], transpose: boolean = false): void {
