@@ -4,9 +4,15 @@ import { Context } from './context.js';
 
 import { Debugger } from './debugger.js';
 
+import { Entity } from './entity.js';
+
+import { Material } from './material.js';
+
 import { PointLight } from './light.js';
 
 import { Input } from './input.js';
+
+import { Transform } from './transform.js';
 
 import { Vector3D } from './vector.js';
 
@@ -18,6 +24,8 @@ export class Application {
     private camera: Camera;
 
     private debugger: Debugger = new Debugger('HUD', 'DEBUG', 'error', 'toggleDebugging');
+
+    private entity: Entity;
 
     private light: PointLight;
 
@@ -33,6 +41,12 @@ export class Application {
             sensitivity: 0.1,
             zoomSpeed: 0.5,
         });
+
+        this.entity = new Entity(
+            new Material(this.context.program),
+            this.context.mesh,
+            new Transform()
+        );
 
         this.light = new PointLight(
             2,
@@ -63,7 +77,7 @@ export class Application {
 
         this.context.clear();
 
-        this.context.draw(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
+        this.context.draw(this.entity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
 

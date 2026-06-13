@@ -2,6 +2,8 @@ import * as glMatrix from 'gl-matrix';
 
 import { Cube } from './cube.js';
 
+import { Entity } from './entity.js';
+
 import { PointLight } from './light.js';
 
 import { Mesh } from './mesh.js';
@@ -71,8 +73,10 @@ export class Context {
         this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
     }
 
-    public draw(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4, light: PointLight): void {
-        this.context.uniformMatrix4fv(this.worldLocation, false, world);
+    public draw(entity: Entity, view: glMatrix.mat4, projection: glMatrix.mat4, light: PointLight): void {
+        entity.material.apply(this.context);
+
+        this.context.uniformMatrix4fv(this.worldLocation, false, entity.world());
 
         this.context.uniformMatrix4fv(this.viewLocation, false, view);
 
