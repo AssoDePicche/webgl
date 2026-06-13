@@ -49,11 +49,7 @@ export class Context {
         this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
     }
 
-    public draw(entity: Entity, view: glMatrix.mat4, projection: glMatrix.mat4, light: PointLight): void {
-        entity.material.apply(this.context);
-
-        this.context.uniformMatrix4fv(this.worldLocation, false, entity.world());
-
+    public setupScene(view: glMatrix.mat4, projection: glMatrix.mat4, light: PointLight): void {
         this.context.uniformMatrix4fv(this.viewLocation, false, view);
 
         this.context.uniformMatrix4fv(this.projectionLocation, false, projection);
@@ -63,6 +59,12 @@ export class Context {
         this.context.uniform3fv(this.lightColorLocation, [light.color.red, light.color.green, light.color.blue]);
 
         this.context.uniform3fv(this.lightPositionLocation, light.position.toArray());
+    }
+
+    public draw(entity: Entity): void {
+        entity.material.apply(this.context);
+
+        this.context.uniformMatrix4fv(this.worldLocation, false, entity.world());
 
         const aPosition = entity.material.program.getAttribLocation('aPosition');
 

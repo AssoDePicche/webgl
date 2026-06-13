@@ -101,8 +101,10 @@ export class Application {
 
         this.context.clear();
 
+        this.context.setupScene(this.camera.viewMatrix, this.camera.projectionMatrix, this.light);;
+
         for (const entity of this.entities) {
-            this.context.draw(entity, this.camera.viewMatrix, this.camera.projectionMatrix, this.light);
+            this.context.draw(entity);
         }
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far);
