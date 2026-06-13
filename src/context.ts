@@ -6,8 +6,6 @@ import { PointLight } from './light.js';
 
 import { Mesh } from './mesh.js';
 
-import { Point3D } from './point.js';
-
 import { Program } from './program.js';
 
 import { Texture } from './texture.js';

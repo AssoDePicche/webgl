@@ -38,8 +38,7 @@ export class Application {
             2,
             3,
             0.002,
-            { red: 1, green: 1, blue: 1, alpha: 1 },
-            new Vector3D(.75, 0.09, 0.032)
+            new Vector3D(255, 0.09, 0.032)
         );
     }
 
@@ -53,6 +52,8 @@ export class Application {
         const near: number = this.input.nearBounds;
 
         const far: number = this.input.farBounds;
+
+        this.light.color = this.input.lightColor;
 
         this.light.update(time);
 

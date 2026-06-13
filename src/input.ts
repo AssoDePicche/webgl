@@ -1,3 +1,5 @@
+import { type Color, RGBAColor } from './color.js';
+
 import { Point2D } from './point.js';
 
 class KeyboardInput {
@@ -52,6 +54,8 @@ export class Input {
 
     private far: HTMLInputElement;
 
+    private _lightColor: HTMLInputElement;
+
     private _isDragging: boolean = false;
 
     private _lastTouchDistance: number = 0;
@@ -69,17 +73,19 @@ export class Input {
     public constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
 
-        this.coordsX = this.getSlider('angleX');
+        this.coordsX = this.getHTMLInputElement('angleX');
 
-        this.coordsY = this.getSlider('angleY');
+        this.coordsY = this.getHTMLInputElement('angleY');
 
-        this.coordsZ = this.getSlider('angleZ');
+        this.coordsZ = this.getHTMLInputElement('angleZ');
 
-        this.fov = this.getSlider('fieldOfView');
+        this.fov = this.getHTMLInputElement('fieldOfView');
 
-        this.near = this.getSlider('nearBound');
+        this.near = this.getHTMLInputElement('nearBound');
 
-        this.far = this.getSlider('farBound');
+        this.far = this.getHTMLInputElement('farBound');
+
+        this._lightColor = this.getHTMLInputElement('lightColor');
 
         this.attachListeners();
     }
@@ -128,10 +134,14 @@ export class Input {
         return parseFloat(this.far.value);
     }
 
-    private getSlider(id: string): HTMLInputElement {
+    public get lightColor(): Color {
+        return RGBAColor.fromHex(this._lightColor.value);
+    }
+
+    private getHTMLInputElement(id: string): HTMLInputElement {
         const element = document.getElementById(id);
 
-        if (!element) throw new Error(`Slider Input Element #${id} was not found in DOM.`);
+        if (!element) throw new Error(`HTML Input Element #${id} was not found in DOM.`);
 
         return element as HTMLInputElement;
     }
