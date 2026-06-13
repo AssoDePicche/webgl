@@ -36,27 +36,29 @@ export class Camera {
 
     private _projectionMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
-    private keyInputEvents: KeyInputEvent[] = [
-        {
-            triggerKey: 'w',
-            onKeyPress: () => this.radius -= this.settings.zoomSpeed,
-        },
-        {
-            triggerKey: 'a',
-            onKeyPress: () => this.radius += this.settings.zoomSpeed,
-        },
-        {
-            triggerKey: 's',
-            onKeyPress: () => this.theta -= this.settings.sensitivity,
-        },
-        {
-            triggerKey: 'd',
-            onKeyPress: () => this.theta += this.settings.sensitivity,
-        },
-    ];
+    private keyInputEvents: KeyInputEvent[];
 
     public constructor(settings: CameraSettings) {
         this.settings = settings;
+
+        this.keyInputEvents = [
+            {
+                triggerKey: 'w',
+                onKeyPress: () => this.radius -= this.settings.zoomSpeed,
+            },
+            {
+                triggerKey: 'a',
+                onKeyPress: () => this.theta -= this.settings.sensitivity,
+            },
+            {
+                triggerKey: 's',
+                onKeyPress: () => this.radius += this.settings.zoomSpeed,
+            },
+            {
+                triggerKey: 'd',
+                onKeyPress: () => this.theta += this.settings.sensitivity,
+            },
+        ];
     }
 
     public update(input: Input): void {
