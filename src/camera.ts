@@ -65,17 +65,11 @@ export class Camera {
                 deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
                 -deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
             );
+        } else if (input.rotations[0] !== 0 || input.rotations[1] !== 0 || input.rotations[2] !== 0) {
+            const [roll, pitch, yaw] = input.rotations;
+
+            this.rotate(roll, pitch, yaw);
         }
-
-        const [roll, pitch, yaw] = input.rotations;
-
-        glMatrix.mat4.identity(this._worldMatrix);
-
-        glMatrix.mat4.rotateX(this._worldMatrix, this._worldMatrix, deg2Rad(roll));
-
-        glMatrix.mat4.rotateY(this._worldMatrix, this._worldMatrix, deg2Rad(pitch));
-
-        glMatrix.mat4.rotateZ(this._worldMatrix, this._worldMatrix, deg2Rad(yaw));
 
         const dRadius: number = input.deltaZoom * this.settings.zoomSpeed;
 
@@ -133,6 +127,20 @@ export class Camera {
 
     public zoomOut(deltaRadius: number): void {
         this.updateOrbit(Math.abs(deltaRadius), 0, 0);
+    }
+
+    private rotate(roll: number, pitch: number, yaw: number): void {
+        let radius: number = 16 - deg2Rad(roll);
+
+        let theta: number = deg2Rad(yaw);
+
+        let phi: number = deg2Rad(pitch);
+
+        radius = clamp(radius, this.settings.minRadius, this.settings.maxRadius);
+
+        phi = clamp(phi, 0.01, Math.PI - 0.01);
+
+        this.orbit = new Spherical(radius, theta, phi);
     }
 
     private updateOrbit(dRadius: number, dTheta: number, dPhi: number): void {
