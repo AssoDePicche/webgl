@@ -2,11 +2,12 @@ import * as glMatrix from 'gl-matrix';
 
 import { Input } from './input.js';
 
-import { Point3D } from './point.js';
+import { Point3D, Spherical } from './point.js';
 
 import { clamp, deg2Rad } from './utils.js';
 
 export interface CameraSettings {
+    aspectRatio: number;
     minRadius: number;
     maxRadius: number;
     moveSpeed: number;
@@ -20,15 +21,9 @@ interface KeyInputEvent {
 }
 
 export class Camera {
-    private phi: number = 0.0;
-
-    private theta: number = 0.0;
-
-    private radius: number = 16.0;
+    private orbit: Spherical = new Spherical(16, deg2Rad(90), deg2Rad(90));
 
     private settings: CameraSettings;
-
-    private bounds: number = Math.PI / 2.1;
 
     private _worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
@@ -44,19 +39,19 @@ export class Camera {
         this.keyInputEvents = [
             {
                 triggerKey: 'w',
-                onKeyPress: () => this.radius -= this.settings.zoomSpeed,
+                onKeyPress: () => this.zoomIn(this.settings.zoomSpeed),
             },
             {
                 triggerKey: 'a',
-                onKeyPress: () => this.theta -= this.settings.sensitivity,
+                onKeyPress: () => this.orbitHorizontal(this.settings.sensitivity),
             },
             {
                 triggerKey: 's',
-                onKeyPress: () => this.radius += this.settings.zoomSpeed,
+                onKeyPress: () => this.zoomOut(this.settings.zoomSpeed),
             },
             {
                 triggerKey: 'd',
-                onKeyPress: () => this.theta += this.settings.sensitivity,
+                onKeyPress: () => this.orbitHorizontal(-this.settings.sensitivity),
             },
         ];
     }
@@ -65,15 +60,29 @@ export class Camera {
         const dragScale: number = 10; // this.settings.sensitivity;
 
         if (input.isDragging) {
-            this.theta -= deg2Rad(input.deltaX * this.settings.sensitivity * dragScale);
-
-            this.phi += deg2Rad(input.deltaY * this.settings.sensitivity * dragScale);
-
-            this.phi = clamp(this.phi, - this.bounds, this.bounds);
+            this.updateOrbit(
+                0,
+                deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
+                -deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
+            );
         }
 
-        if (input.deltaZoom !== 0) {
-            this.radius -= input.deltaZoom * this.settings.zoomSpeed;
+        const [roll, pitch, yaw] = input.rotations;
+
+        glMatrix.mat4.identity(this._worldMatrix);
+
+        glMatrix.mat4.rotateX(this._worldMatrix, this._worldMatrix, deg2Rad(roll));
+
+        glMatrix.mat4.rotateY(this._worldMatrix, this._worldMatrix, deg2Rad(pitch));
+
+        glMatrix.mat4.rotateZ(this._worldMatrix, this._worldMatrix, deg2Rad(yaw));
+
+        const dRadius: number = input.deltaZoom * this.settings.zoomSpeed;
+
+        if (dRadius > 0) {
+            this.zoomIn(dRadius);
+        } else {
+            this.zoomOut(dRadius);
         }
 
         this.keyInputEvents.forEach(({ triggerKey, onKeyPress }) => {
@@ -82,15 +91,16 @@ export class Camera {
             }
         });
 
-        this.radius = clamp(this.radius, this.settings.minRadius, this.settings.maxRadius);
+        glMatrix.mat4.lookAt(this._viewMatrix, this.eye.toArray(), this.at.toArray(), this.up.toArray());
+
+        glMatrix.mat4.perspective(this._projectionMatrix, deg2Rad(input.fieldOfViewDegrees), this.settings.aspectRatio, input.nearBounds, input.farBounds);
+
     }
 
     public get eye(): Point3D {
-        return new Point3D(
-            this.radius * Math.cos(this.phi) * Math.sin(this.theta),
-            this.radius * Math.sin(this.phi),
-            this.radius * Math.cos(this.phi) * Math.cos(this.theta)
-        );
+        const cartesian: Point3D = this.orbit.cartesian;
+
+        return new Point3D(cartesian.x, cartesian.z, cartesian.y);
     }
 
     public get at(): Point3D {
@@ -113,19 +123,29 @@ export class Camera {
         return this._worldMatrix;
     }
 
-    public lookAt(fovDegrees: number, aspectRatio: number, near: number, far: number): void {
-        glMatrix.mat4.lookAt(this._viewMatrix, this.eye.toArray(), this.at.toArray(), this.up.toArray());
-
-        glMatrix.mat4.perspective(this._projectionMatrix, deg2Rad(fovDegrees), aspectRatio, near, far);
+    public orbitHorizontal(dTheta: number): void {
+        this.updateOrbit(0, dTheta, 0);
     }
 
-    public rotate(roll: number, pitch: number, yaw: number): void {
-        glMatrix.mat4.identity(this._worldMatrix);
+    public zoomIn(deltaRadius: number): void {
+        this.updateOrbit(-Math.abs(deltaRadius), 0, 0);
+    }
 
-        glMatrix.mat4.rotate(this._worldMatrix, this._worldMatrix, roll, [1, 0, 0]);
+    public zoomOut(deltaRadius: number): void {
+        this.updateOrbit(Math.abs(deltaRadius), 0, 0);
+    }
 
-        glMatrix.mat4.rotate(this._worldMatrix, this._worldMatrix, pitch, [0, 1, 0]);
+    private updateOrbit(dRadius: number, dTheta: number, dPhi: number): void {
+        let radius: number = this.orbit.radius + dRadius;
 
-        glMatrix.mat4.rotate(this._worldMatrix, this._worldMatrix, yaw, [0, 0, 1]);
+        let theta: number = this.orbit.theta + dTheta;
+
+        let phi: number = this.orbit.phi + dPhi;
+
+        radius = clamp(radius, this.settings.minRadius, this.settings.maxRadius);
+
+        phi = clamp(phi, 0.01, Math.PI - 0.01);
+
+        this.orbit = new Spherical(radius, theta, phi);
     }
 }

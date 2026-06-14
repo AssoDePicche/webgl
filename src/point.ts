@@ -79,7 +79,35 @@ export class Point3D extends Point2D {
         );
     }
 
+    public spherical(): Spherical {
+        const origin: Point3D = new Point3D(0, 0, 0);
+
+        const radius: number = this.euclidian(origin);
+
+        return new Spherical(
+            radius,
+            Math.atan2(this.y, this.x),
+            Math.acos(this.z / radius)
+        );
+    }
+
     public toArray(): number[] {
         return [this.x, this.y, this._z];
+    }
+}
+
+export class Spherical {
+    public constructor(
+        public readonly radius: number,
+        public readonly theta: number,
+        public readonly phi: number
+    ) { }
+
+    public get cartesian(): Point3D {
+        return new Point3D(
+            this.radius * Math.sin(this.phi) * Math.cos(this.theta),
+            this.radius * Math.sin(this.phi) * Math.sin(this.theta),
+            this.radius * Math.cos(this.phi)
+        );
     }
 }

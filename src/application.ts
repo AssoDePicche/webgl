@@ -27,12 +27,13 @@ export class Application {
 
     private light: PointLight;
 
-    public constructor(context: Context, vertexSource: string, fragmentSource: string) {
+    public constructor(context: Context) {
         this.context = context;
 
         this.input = new Input(this.context.canvas);
 
         this.camera = new Camera({
+            aspectRatio: this.context.aspectRatio,
             minRadius: 1.5,
             maxRadius: 20.0,
             moveSpeed: 0.5,
@@ -58,21 +59,9 @@ export class Application {
     public render = (time: number): void => {
         this.camera.update(this.input);
 
-        const [roll, pitch, yaw] = this.input.rotations;
-
-        const fovDegrees: number = this.input.fieldOfViewDegrees;
-
-        const near: number = this.input.nearBounds;
-
-        const far: number = this.input.farBounds;
-
         this.light.color = this.input.lightColor;
 
         this.light.update(time);
-
-        this.camera.lookAt(fovDegrees, this.context.aspectRatio, near, far);
-
-        this.camera.rotate(roll, pitch, yaw);
 
         this.context.clear();
 
@@ -82,13 +71,11 @@ export class Application {
             this.context.draw(entity);
         }
 
-        this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, fovDegrees, near, far, this.light.position);
+        this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, this.input.fieldOfViewDegrees, this.input.nearBounds, this.input.farBounds, this.light.position);
 
-        if (this.debugger.isDebuggingEnabled) {
-            this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
+        this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
 
-            this.debugger.renderMatrices(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix);
-        }
+        this.debugger.renderMatrices(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix);
 
         this.input.flush();
 
