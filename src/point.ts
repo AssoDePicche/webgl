@@ -79,7 +79,7 @@ export class Point3D extends Point2D {
         );
     }
 
-    public spherical(): Spherical {
+    public get spherical(): Spherical {
         const origin: Point3D = new Point3D(0, 0, 0);
 
         const radius: number = this.euclidian(origin);

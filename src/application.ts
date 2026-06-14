@@ -73,8 +73,6 @@ export class Application {
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, this.input.fieldOfViewDegrees, this.input.nearBounds, this.input.farBounds, this.light.position);
 
-        this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
-
         this.debugger.renderMatrices(this.camera.viewMatrix, this.camera.projectionMatrix);
 
         this.input.flush();

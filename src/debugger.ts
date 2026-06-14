@@ -2,7 +2,7 @@ import * as glMatrix from 'gl-matrix';
 
 import { flatten } from './flatten.js';
 
-import { Point2D, Point3D } from './point.js';
+import { Point3D } from './point.js';
 
 export class Debugger {
     private debug: HTMLElement;
@@ -45,6 +45,10 @@ export class Debugger {
 
         this.HUD.textContent += `Eye = ${formatPoint(eye)}\n`;
 
+        const spherical = eye.spherical;
+
+        this.HUD.textContent += `Eye (Spherical) = (${spherical.radius.toFixed(2)}, ${spherical.theta.toFixed(2)}, ${spherical.phi.toFixed(2)})\n`;
+
         this.HUD.textContent += `At = ${formatPoint(at)}\n`;
 
         this.HUD.textContent += `Up = ${formatPoint(up)}\n`;
@@ -56,14 +60,6 @@ export class Debugger {
         this.HUD.textContent += `Near: ${near}\n`;
 
         this.HUD.textContent += `Far: ${far}\n`;
-    }
-
-    public renderInputInfo(isDragging: boolean, touchDistance: number, mousePosition: Point2D): void {
-        if (!this._isDebuggingEnabled) {
-            return;
-        }
-
-        this.debug.innerHTML = `<div>(${isDragging}, ${touchDistance.toFixed(2)}, ${mousePosition.x}, ${mousePosition.y})</div>`;
     }
 
     public renderMatrices(view: glMatrix.mat4, projection: glMatrix.mat4): void {
