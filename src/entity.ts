@@ -54,8 +54,8 @@ export class Entity {
 export class EntityFactory {
     public constructor(private context: Context) { }
 
-    public createCube(textureSource: string): Entity {
-        return this.createEntity(textureSource, Cube.indices, Cube.vertices);
+    public createCube(textureSource: string, offset: Point3D = new Point3D(0, 0, 0)): Entity {
+        return this.createEntity(textureSource, Cube.indices, Cube.vertices, offset);
     }
 
     public createSphere(textureSource: string, offset: Point3D = new Point3D(0, 0, 0)): Entity {
@@ -64,7 +64,7 @@ export class EntityFactory {
         return this.createEntity(textureSource, sphere.indices, sphere.vertices, offset);
     }
 
-    private createEntity(textureSource: string, indices: Uint16Array, vertices: Float32Array, offset: Point3D = new Point3D(0, 0, 0)): Entity {
+    private createEntity(textureSource: string, indices: Uint16Array, vertices: Float32Array, offset: Point3D): Entity {
         const texture: Texture = new Texture(this.context.context, textureSource);
 
         const material: Material = new Material(this.context.program, texture);

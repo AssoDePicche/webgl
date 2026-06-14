@@ -44,8 +44,8 @@ export class Application {
         const factory: EntityFactory = new EntityFactory(this.context);
 
         this.entities.push(
-            factory.createCube('crate.svg'),
-            factory.createSphere('', new Point3D(-3, 0, 0)),
+            factory.createCube('crate.svg', new Point3D(-3, 0, 0)),
+            factory.createSphere('planet.jpg'),
         );
 
         this.light = new PointLight(
@@ -75,7 +75,7 @@ export class Application {
 
         this.debugger.renderInputInfo(this.input.isDragging, this.input.lastTouchDistance, this.input.lastPosition);
 
-        this.debugger.renderMatrices(this.camera.worldMatrix, this.camera.viewMatrix, this.camera.projectionMatrix);
+        this.debugger.renderMatrices(this.camera.viewMatrix, this.camera.projectionMatrix);
 
         this.input.flush();
 

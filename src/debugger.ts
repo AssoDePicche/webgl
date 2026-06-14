@@ -49,13 +49,13 @@ export class Debugger {
 
         this.HUD.textContent += `Up = ${formatPoint(up)}\n`;
 
-        this.HUD.textContent += `FOV: ${fov}\n`;
+        this.HUD.textContent += `Light = ${formatPoint(light)}\n`;
+
+        this.HUD.textContent += `FOV: ${fov}°\n`;
 
         this.HUD.textContent += `Near: ${near}\n`;
 
         this.HUD.textContent += `Far: ${far}\n`;
-
-        this.HUD.textContent += `Light Position = ${formatPoint(light)}\n`;
     }
 
     public renderInputInfo(isDragging: boolean, touchDistance: number, mousePosition: Point2D): void {
@@ -66,7 +66,7 @@ export class Debugger {
         this.debug.innerHTML = `<div>(${isDragging}, ${touchDistance.toFixed(2)}, ${mousePosition.x}, ${mousePosition.y})</div>`;
     }
 
-    public renderMatrices(world: glMatrix.mat4, view: glMatrix.mat4, projection: glMatrix.mat4): void {
+    public renderMatrices(view: glMatrix.mat4, projection: glMatrix.mat4): void {
         if (!this._isDebuggingEnabled) {
             return;
         }
@@ -76,8 +76,6 @@ export class Debugger {
         html += `<div>${this.formatMatrix(projection)}</div>`;
 
         html += `<div>${this.formatMatrix(view)}</div>`;
-
-        html += `<div>${this.formatMatrix(world)}</div>`;
 
         this.debug.innerHTML = html;
     }
