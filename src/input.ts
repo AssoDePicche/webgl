@@ -8,6 +8,10 @@ class KeyboardInput {
         a: false,
         s: false,
         d: false,
+        i: false,
+        j: false,
+        k: false,
+        l: false,
     };
 
     public constructor() {

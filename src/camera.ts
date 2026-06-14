@@ -25,6 +25,8 @@ export class Camera {
 
     private settings: CameraSettings;
 
+    private _at: Point3D = new Point3D(0, 0, 0);
+
     private _worldMatrix = glMatrix.mat4.identity(new Float32Array(16));
 
     private _viewMatrix = glMatrix.mat4.identity(new Float32Array(16));
@@ -37,22 +39,14 @@ export class Camera {
         this.settings = settings;
 
         this.keyInputEvents = [
-            {
-                triggerKey: 'w',
-                onKeyPress: () => this.zoomIn(this.settings.zoomSpeed),
-            },
-            {
-                triggerKey: 'a',
-                onKeyPress: () => this.orbitHorizontal(this.settings.sensitivity),
-            },
-            {
-                triggerKey: 's',
-                onKeyPress: () => this.zoomOut(this.settings.zoomSpeed),
-            },
-            {
-                triggerKey: 'd',
-                onKeyPress: () => this.orbitHorizontal(-this.settings.sensitivity),
-            },
+            { triggerKey: 'w', onKeyPress: () => this.zoomIn(this.settings.zoomSpeed) },
+            { triggerKey: 'a', onKeyPress: () => this.orbitHorizontal(this.settings.sensitivity) },
+            { triggerKey: 's', onKeyPress: () => this.zoomOut(this.settings.zoomSpeed) },
+            { triggerKey: 'd', onKeyPress: () => this.orbitHorizontal(-this.settings.sensitivity) },
+            { triggerKey: 'i', onKeyPress: () => this._at = this._at.sum(new Point3D(0, this.settings.sensitivity, 0)) },
+            { triggerKey: 'j', onKeyPress: () => this._at = this._at.sum(new Point3D(-this.settings.sensitivity, 0, 0)) },
+            { triggerKey: 'k', onKeyPress: () => this._at = this._at.sum(new Point3D(0, -this.settings.sensitivity, 0)) },
+            { triggerKey: 'l', onKeyPress: () => this._at = this._at.sum(new Point3D(this.settings.sensitivity, 0, 0)) },
         ];
     }
 
@@ -98,7 +92,7 @@ export class Camera {
     }
 
     public get at(): Point3D {
-        return new Point3D(0.0, 0.0, 0.0);
+        return this._at;
     }
 
     public get up(): Point3D {

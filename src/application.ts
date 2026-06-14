@@ -38,13 +38,12 @@ export class Application {
             maxRadius: 20.0,
             moveSpeed: 0.5,
             sensitivity: 0.1,
-            zoomSpeed: 0.5,
+            zoomSpeed: 0.25,
         });
 
         const factory: EntityFactory = new EntityFactory(this.context);
 
         this.entities.push(
-            factory.createCube('crate.svg', new Point3D(-3, 0, 0)),
             factory.createSphere('planet.jpg'),
         );
 

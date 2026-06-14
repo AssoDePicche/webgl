@@ -91,6 +91,14 @@ export class Point3D extends Point2D {
         );
     }
 
+    public sum(point: Point3D): Point3D {
+        return new Point3D(
+            this.x + point.x,
+            this.y + point.y,
+            this.z + point.z
+        );
+    }
+
     public toArray(): number[] {
         return [this.x, this.y, this._z];
     }
