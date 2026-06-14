@@ -41,12 +41,20 @@ body {
 #HUD {
   font-size: 1.8rem;
   white-space: pre-wrap;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1rem;
 }
 
 #DEBUG {
   font-family: monospace;
   font-size: 1.2rem;
   display: flex;
+  padding: 1rem;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 #error {
@@ -56,6 +64,16 @@ body {
   justify-content: center;
   padding: 1rem;
   text-align: center;
+}
+
+#toggleDebugging {
+    font-size: 1.8rem;
+    min-height: 36px;
+    min-width: 280px;
+}
+
+#toggleDebugging:hover {
+    cursor: pointer;
 }
 
 @media(max-width: 767px) {
