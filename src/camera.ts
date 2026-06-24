@@ -56,8 +56,8 @@ export class Camera {
         if (input.isDragging) {
             this.updateOrbit(
                 0,
-                deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
-                -deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
+                -deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
+                deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
             );
         } else if (input.rotations[0] !== 0 || input.rotations[1] !== 0 || input.rotations[2] !== 0) {
             const [roll, pitch, yaw] = input.rotations;
