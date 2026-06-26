@@ -69,9 +69,7 @@ export class EntityFactory {
     private createEntity(textureSource: string, indices: Uint16Array, vertices: Float32Array, offset: Point3D): Entity {
         const texture: Texture = new Texture(this.context.context, textureSource);
 
-        const bumpMap: Texture = Texture.generateBumpMap(this.context.context, textureSource, 3.0);
-
-        const material: Material = new Material(this.context.program, texture, bumpMap);
+        const material: Material = new Material(this.context.program, texture);
 
         const mesh: Mesh = new Mesh(this.context.context, indices, vertices);
 
