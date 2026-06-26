@@ -46,12 +46,6 @@ class KeyboardInput {
 export class Input {
     private canvas: HTMLCanvasElement;
 
-    private coordsX: HTMLInputElement;
-
-    private coordsY: HTMLInputElement;
-
-    private coordsZ: HTMLInputElement;
-
     private fov: HTMLInputElement;
 
     private near: HTMLInputElement;
@@ -76,12 +70,6 @@ export class Input {
 
     public constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-
-        this.coordsX = this.getHTMLInputElement('angleX');
-
-        this.coordsY = this.getHTMLInputElement('angleY');
-
-        this.coordsZ = this.getHTMLInputElement('angleZ');
 
         this.fov = this.getHTMLInputElement('fieldOfView');
 
@@ -116,14 +104,6 @@ export class Input {
 
     public get lastTouchDistance(): number {
         return this._lastTouchDistance;
-    }
-
-    public get rotations(): [number, number, number] {
-        return [
-            parseFloat(this.coordsX.value),
-            parseFloat(this.coordsY.value),
-            parseFloat(this.coordsZ.value)
-        ];
     }
 
     public get fieldOfViewDegrees(): number {

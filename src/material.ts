@@ -8,9 +8,9 @@ export class Material {
         public readonly texture: Texture
     ) { }
 
-    public apply(context: WebGLRenderingContext): void {
+    public apply(): void {
         this.program.use();
 
-        this.texture.activate();
+        this.texture.activate(0);
     }
 }

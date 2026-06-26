@@ -21,7 +21,7 @@ interface KeyInputEvent {
 }
 
 export class Camera {
-    private orbit: Spherical = new Spherical(16, deg2Rad(90), deg2Rad(90));
+    private orbit: Spherical;
 
     private settings: CameraSettings;
 
@@ -37,6 +37,11 @@ export class Camera {
 
     public constructor(settings: CameraSettings) {
         this.settings = settings;
+
+        const radius: number = clamp(this.settings.maxRadius - 4, this.settings.minRadius, this.settings.maxRadius);
+
+        this.orbit = new Spherical(radius, deg2Rad(90), deg2Rad(90));
+
 
         this.keyInputEvents = [
             { triggerKey: 'w', onKeyPress: () => this.zoomIn(this.settings.zoomSpeed) },
@@ -59,10 +64,6 @@ export class Camera {
                 -deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
                 deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
             );
-        } else if (input.rotations[0] !== 0 || input.rotations[1] !== 0 || input.rotations[2] !== 0) {
-            const [roll, pitch, yaw] = input.rotations;
-
-            this.rotate(roll, pitch, yaw);
         }
 
         const dRadius: number = input.deltaZoom * this.settings.zoomSpeed;
@@ -121,20 +122,6 @@ export class Camera {
 
     public zoomOut(deltaRadius: number): void {
         this.updateOrbit(Math.abs(deltaRadius), 0, 0);
-    }
-
-    private rotate(roll: number, pitch: number, yaw: number): void {
-        let radius: number = 16 - deg2Rad(roll);
-
-        let theta: number = deg2Rad(yaw);
-
-        let phi: number = deg2Rad(pitch);
-
-        radius = clamp(radius, this.settings.minRadius, this.settings.maxRadius);
-
-        phi = clamp(phi, 0.01, Math.PI - 0.01);
-
-        this.orbit = new Spherical(radius, theta, phi);
     }
 
     private updateOrbit(dRadius: number, dTheta: number, dPhi: number): void {

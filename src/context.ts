@@ -62,9 +62,13 @@ export class Context {
     }
 
     public draw(entity: Entity): void {
-        entity.material.apply(this.context);
+        entity.material.apply();
 
         this.context.uniformMatrix4fv(this.worldLocation, false, entity.world());
+
+        const uTextureLoc = entity.material.program.getUniformLocation('u_Texture');
+
+        this.context.uniform1i(uTextureLoc, 0);
 
         const aNormal = entity.material.program.getAttribLocation('aNormal');
 
@@ -72,11 +76,7 @@ export class Context {
 
         const aTextureCoordinates = entity.material.program.getAttribLocation('aTextureCoordinates');
 
-        entity.mesh.bind(aNormal, 3, 8, 3);
-
-        entity.mesh.bind(aPosition, 3, 8, 0);
-
-        entity.mesh.bind(aTextureCoordinates, 2, 8, 6);
+        entity.mesh.bind(aPosition, aNormal, aTextureCoordinates)
 
         entity.mesh.draw(this.context.UNSIGNED_SHORT, 0);
     }
@@ -99,6 +99,12 @@ export class Context {
         }
 
         const context = canvas.getContext('webgl') as WebGLRenderingContext;
+
+        const extension: OES_standard_derivatives | null = context.getExtension('OES_standard_derivatives');
+
+        if (!extension) {
+            throw new Error('OES_standard_derivatives is not supported on this platform, Bump Mapping May Fail');
+        }
 
         if (!context) {
             throw new Error('Your Browser Does Not Support WebGL');

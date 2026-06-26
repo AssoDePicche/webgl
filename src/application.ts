@@ -4,13 +4,11 @@ import { Context } from './context.js';
 
 import { Debugger } from './debugger.js';
 
-import { Entity, EntityFactory } from './entity.js';
+import { Entity } from './entity.js';
 
 import { PointLight } from './light.js';
 
 import { Input } from './input.js';
-
-import { Point3D } from './point.js';
 
 import { Vector3D } from './vector.js';
 
@@ -27,7 +25,7 @@ export class Application {
 
     private light: PointLight;
 
-    public constructor(context: Context) {
+    public constructor(context: Context, entities: Entity[]) {
         this.context = context;
 
         this.input = new Input(this.context.canvas);
@@ -41,11 +39,7 @@ export class Application {
             zoomSpeed: 0.25,
         });
 
-        const factory: EntityFactory = new EntityFactory(this.context);
-
-        this.entities.push(
-            factory.createSphere('planet.jpg'),
-        );
+        this.entities = entities;
 
         this.light = new PointLight(
             2,
