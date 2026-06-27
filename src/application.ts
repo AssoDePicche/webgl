@@ -4,7 +4,7 @@ import { Context } from './context.js';
 
 import { Debugger } from './debugger.js';
 
-import { Entity } from './entity.js';
+import { Entity, EntityFactory } from './entity.js';
 
 import { PointLight } from './light.js';
 
@@ -23,6 +23,8 @@ export class Application {
 
     private entities: Entity[] = [];
 
+    private gizmo: Entity;
+
     private light: PointLight;
 
     public constructor(context: Context, entities: Entity[]) {
@@ -40,6 +42,10 @@ export class Application {
         });
 
         this.entities = entities;
+
+        const factory = new EntityFactory(this.context);
+
+        this.gizmo = factory.createGizmo('gizmo.png');
 
         this.light = new PointLight(
             2,
@@ -67,6 +73,8 @@ export class Application {
         for (const entity of this.entities) {
             this.context.draw(entity);
         }
+
+        this.context.drawGizmo(this.gizmo, this.camera.viewMatrix, 200);
 
         this.debugger.renderHUD(this.camera.eye, this.camera.at, this.camera.up, this.input.fieldOfViewDegrees, this.input.nearBounds, this.input.farBounds, this.light.position);
 

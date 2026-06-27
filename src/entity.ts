@@ -4,6 +4,8 @@ import { Context } from './context.js';
 
 import { Cube } from './cube.js';
 
+import { Gizmo } from './gizmo.js';
+
 import { Material } from './material.js';
 
 import { Mesh } from './mesh.js';
@@ -56,6 +58,10 @@ export class EntityFactory {
 
     public createCube(textureSource: string, offset: Point3D = new Point3D(0, 0, 0)): Entity {
         return this.createEntity(textureSource, Cube.indices, Cube.vertices, offset);
+    }
+
+    public createGizmo(textureSource: string): Entity {
+        return this.createEntity(textureSource, Gizmo.indices, Gizmo.vertices, new Point3D(0, 0, 0));
     }
 
     public createSphere(textureSource: string, offset: Point3D = new Point3D(0, 0, 0)): Entity {

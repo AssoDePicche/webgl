@@ -91,6 +91,38 @@ export class Context {
         return this.context.canvas as HTMLCanvasElement;
     }
 
+    public drawGizmo(gizmoEntity: Entity, viewMatrix: glMatrix.mat4, gizmoSize: number): void {
+        const originalWidth: number = this.canvas.width;
+
+        const originalHeight: number = this.canvas.height;
+
+        this.context.viewport(0, 0, gizmoSize, gizmoSize);
+
+        this.context.clear(this.context.DEPTH_BUFFER_BIT);
+
+        const rotationView = glMatrix.mat4.create();
+
+        glMatrix.mat4.copy(rotationView, viewMatrix);
+
+        rotationView[12] = 0; // Clear X translation
+
+        rotationView[13] = 0; // Clear Y translation
+
+        rotationView[14] = -4; // Step back slightly on Z so the gizmo is in front of the camera
+
+        const gizmoProj = glMatrix.mat4.create();
+
+        glMatrix.mat4.perspective(gizmoProj, Math.PI / 4, 1, 0.1, 10.0);
+
+        this.context.uniformMatrix4fv(this.viewLocation, false, rotationView);
+
+        this.context.uniformMatrix4fv(this.projectionLocation, false, gizmoProj);
+
+        this.draw(gizmoEntity);
+
+        this.context.viewport(0, 0, originalWidth, originalHeight);
+    }
+
     private getGraphicsContext(canvasId: string): WebGLRenderingContext {
         const canvas: HTMLCanvasElement | null = document.getElementById(canvasId) as HTMLCanvasElement;
 
