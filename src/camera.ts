@@ -61,8 +61,8 @@ export class Camera {
         if (input.isDragging) {
             this.updateOrbit(
                 0,
-                -deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
-                deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
+                deg2Rad(input.deltaX * this.settings.sensitivity * dragScale),
+                -deg2Rad(input.deltaY * this.settings.sensitivity * dragScale)
             );
         }
 

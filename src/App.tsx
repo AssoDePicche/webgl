@@ -1,4 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import { type FC, type ReactNode, useEffect, useRef, useState } from 'react';
+
+import styled from 'styled-components';
+
+import { Input } from './components/Input.js';
 
 import { getFileContents } from './fs.js';
 
@@ -8,7 +12,74 @@ import { Entity, EntityFactory } from './entity.js';
 
 import { Application } from './application.js';
 
-export const App = () => {
+const Canvas = styled.canvas`
+  max-width: 100%;
+`;
+
+const Container = styled.div`
+    align-items: center;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+`;
+
+const DEBUG = styled.div`
+  display: flex;
+  font-family: monospace;
+  font-size: 1.2rem;
+  padding: 1rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  @media(max-width: 767px) {
+      flex-direction: column;
+  }
+`;
+
+const ERROR = styled.div`
+  align-items: center;
+  display: flex;
+  font-size: 2rem;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+`;
+
+const HUD = styled.span`
+  font-size: 1.8rem;
+  left: 0;
+  padding: 1rem;
+  position: absolute;
+  top: 0;
+  white-space: pre-wrap;
+`;
+
+const Button = styled.button`
+    font-size: 1.8rem;
+    min-height: 36px;
+    min-width: 280px;
+
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
+const DebugButton: FC = (): ReactNode => {
+    const [isPressed, setIsPressed] = useState<boolean>(false);
+
+    const toggleState = () => setIsPressed(!isPressed);
+
+    return (
+        <Button id="toggleDebugging" onClick={toggleState}>
+        {!isPressed ? 'Show Debugging' : 'Hide Debugging'}
+        </Button>
+    );
+};
+
+const App = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const isInitialized = useRef(false);
@@ -46,34 +117,26 @@ export const App = () => {
   }, []);
 
   return (
-    <div className="app-container">
-      <canvas ref={canvasRef} id="canvas" width="800" height="600" />
+    <Container>
+      <Canvas ref={canvasRef} id="canvas" width="800" height="600" />
 
-      <div id="error"></div>
-      <button id="toggleDebugging"></button>
-      
-      <div className="input__container">
-        <label htmlFor="fieldOfView">FOV</label>
-        <input id="fieldOfView" min="30" max="120" step="15" type="range" defaultValue="30" />
-      </div>
-      
-      <div className="input__container">
-        <label htmlFor="nearBound">Near</label>
-        <input id="nearBound" min="0.1" max="1" step="0.1" type="range" defaultValue="0.1" />
-      </div>
-      
-      <div className="input__container">
-        <label htmlFor="farBound">Far</label>
-        <input id="farBound" min="20" max="50" step="0.1" type="range" defaultValue="20" />
-      </div>
-      
-      <div className="input__container">
-        <label htmlFor="lightColor">Light Color</label>
-        <input id="lightColor" type="color" defaultValue="#FFFFFF" />
-      </div>
+      <ERROR id="error"></ERROR>
 
-      <span id="HUD" className="output__container"></span>
-      <div id="DEBUG"></div>
-    </div>
+       <DebugButton />
+
+      <Input defaultValue="30" id="fieldOfView" label="FOV" max="120" min="30" step="15" type="range" />
+
+      <Input defaultValue="0.1" id="nearBound" label="Near" max="1" min="0.1" step="0.1" type="range" />
+
+      <Input defaultValue="20" id="farBound" label="Far" max="50" min="20" step="0.1" type="range" />
+
+      <Input defaultValue="#ffffff" id="lightColor" label="Light Color" type="color" />
+
+      <HUD id="HUD"></HUD>
+
+      <DEBUG id="DEBUG"></DEBUG>
+    </Container>
   );
 };
+
+export default App;
