@@ -13,7 +13,7 @@ import { Entity, EntityFactory } from './entity.js';
 import { Application } from './application.js';
 
 const Canvas = styled.canvas`
-  max-width: 100%;
+    max-width: 100%;
 `;
 
 const Container = styled.div`
@@ -26,35 +26,35 @@ const Container = styled.div`
 `;
 
 const DEBUG = styled.div`
-  display: flex;
-  font-family: monospace;
-  font-size: 1.2rem;
-  padding: 1rem;
-  position: absolute;
-  right: 0;
-  top: 0;
+    display: flex;
+    font-family: monospace;
+    font-size: 1.2rem;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    top: 0;
 
-  @media(max-width: 767px) {
-      flex-direction: column;
-  }
+    @media(max-width: 767px) {
+        flex-direction: column;
+    }
 `;
 
 const ERROR = styled.div`
-  align-items: center;
-  display: flex;
-  font-size: 2rem;
-  justify-content: center;
-  padding: 1rem;
-  text-align: center;
+    align-items: center;
+    display: flex;
+    font-size: 2rem;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
 `;
 
 const HUD = styled.span`
-  font-size: 1.8rem;
-  left: 0;
-  padding: 1rem;
-  position: absolute;
-  top: 0;
-  white-space: pre-wrap;
+    font-size: 1.8rem;
+    left: 0;
+    padding: 1rem;
+    position: absolute;
+    top: 0;
+    white-space: pre-wrap;
 `;
 
 const Button = styled.button`
@@ -120,9 +120,9 @@ const App = () => {
     <Container>
       <Canvas ref={canvasRef} id="canvas" width="800" height="600" />
 
-      <ERROR id="error"></ERROR>
+      <ERROR id="error" />
 
-       <DebugButton />
+      <DebugButton />
 
       <Input defaultValue="30" id="fieldOfView" label="FOV" max="120" min="30" step="15" type="range" />
 
@@ -132,9 +132,9 @@ const App = () => {
 
       <Input defaultValue="#ffffff" id="lightColor" label="Light Color" type="color" />
 
-      <HUD id="HUD"></HUD>
+      <HUD id="HUD" />
 
-      <DEBUG id="DEBUG"></DEBUG>
+      <DEBUG id="DEBUG" />
     </Container>
   );
 };
