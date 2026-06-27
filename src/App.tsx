@@ -130,6 +130,14 @@ const App = () => {
 
       <Input defaultValue="20" id="farBound" label="Far" max="50" min="20" step="0.1" type="range" />
 
+      <Input id="lightOrbit" label="Light Orbit" type="checkbox" />
+      
+      <Input defaultValue="1" id="lightX" label="Light X" max="1" min="-1" step="0.1" type="range" />
+
+      <Input defaultValue="1" id="lightY" label="Light Y" max="1" min="-1" step="0.1" type="range" />
+
+      <Input defaultValue="-1" id="lightZ" label="Light Z" max="1" min="-1" step="0.1" type="range" />
+
       <Input defaultValue="#ffffff" id="lightColor" label="Light Color" type="color" />
 
       <HUD id="HUD" />

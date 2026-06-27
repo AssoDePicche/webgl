@@ -52,9 +52,13 @@ export class Application {
     public render = (time: number): void => {
         this.camera.update(this.input);
 
-        this.light.color = this.input.lightColor;
+        if (this.input.lightOrbit) {
+            this.light.update(time);
+        } else {
+            this.light.setPosition(this.input.lightPosition);
 
-        this.light.update(time);
+            this.light.color = this.input.lightColor;
+        }
 
         this.context.clear();
 

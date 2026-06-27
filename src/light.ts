@@ -30,6 +30,10 @@ export class PointLight {
         return this._position;
     }
 
+    public setPosition(position: Point3D): void {
+        this._position = position;
+    }
+
     public update(time: number): void {
         const theta: number = time * this.speed;
 

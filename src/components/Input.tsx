@@ -16,7 +16,7 @@ const Label = styled.label`
 `;
 
 interface Properties {
-  defaultValue: string;
+  defaultValue?: string;
   id: string;
   label: string;
   max?: string;

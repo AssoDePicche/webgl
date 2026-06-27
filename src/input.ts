@@ -1,6 +1,6 @@
 import { type Color, RGBAColor } from './color.js';
 
-import { Point2D } from './point.js';
+import { Point2D, Point3D } from './point.js';
 
 class KeyboardInput {
     private keys: Record<string, boolean> = {
@@ -52,6 +52,14 @@ export class Input {
 
     private far: HTMLInputElement;
 
+    private lightX: HTMLInputElement;
+
+    private lightY: HTMLInputElement;
+
+    private lightZ: HTMLInputElement;
+
+    private _lightOrbit: HTMLInputElement;
+
     private _lightColor: HTMLInputElement;
 
     private _isDragging: boolean = false;
@@ -76,6 +84,14 @@ export class Input {
         this.near = this.getHTMLInputElement('nearBound');
 
         this.far = this.getHTMLInputElement('farBound');
+
+        this.lightX = this.getHTMLInputElement('lightX');
+
+        this.lightY = this.getHTMLInputElement('lightY');
+
+        this.lightZ = this.getHTMLInputElement('lightZ');
+
+        this._lightOrbit = this.getHTMLInputElement('lightOrbit');
 
         this._lightColor = this.getHTMLInputElement('lightColor');
 
@@ -120,6 +136,18 @@ export class Input {
 
     public get lightColor(): Color {
         return RGBAColor.fromHex(this._lightColor.value);
+    }
+
+    public get lightOrbit(): boolean {
+        return this._lightOrbit.checked;
+    }
+
+    public get lightPosition(): Point3D {
+        return new Point3D(
+            parseFloat(this.lightX.value),
+            parseFloat(this.lightY.value),
+            parseFloat(this.lightZ.value)
+        );
     }
 
     private getHTMLInputElement(id: string): HTMLInputElement {
