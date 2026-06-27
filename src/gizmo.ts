@@ -17,7 +17,7 @@ export class Gizmo {
             const indexOffset = block * 36;
             const vertexOffset = block * 24;
             for (let i = 0; i < 36; i++) {
-                totalIndices[indexOffset + i] = baseCubeIndices[i] + vertexOffset;
+                totalIndices[indexOffset + i] = baseCubeIndices[i]! + vertexOffset;
             }
         }
         return totalIndices;
@@ -56,17 +56,17 @@ export class Gizmo {
             ];
 
             for (let i = 0; i < 24; i++) {
-                const x = rawPositions[i][0] * scale[0] + shift[0];
-                const y = rawPositions[i][1] * scale[1] + shift[1];
-                const z = rawPositions[i][2] * scale[2] + shift[2];
+                const x = rawPositions[i]![0]! * scale[0]! + shift[0]!;
+                const y = rawPositions[i]![1]! * scale[1]! + shift[1]!;
+                const z = rawPositions[i]![2]! * scale[2]! + shift[2]!;
 
-                const nx = rawNormals[i][0];
-                const ny = rawNormals[i][1];
-                const nz = rawNormals[i][2];
+                const nx = rawNormals[i]![0]!;
+                const ny = rawNormals[i]![1]!;
+                const nz = rawNormals[i]![2]!;
 
                 const uvIndex = i % 4;
-                const u = (rawUVs[uvIndex][0] / 3) + (axisIndex / 3);
-                const v = rawUVs[uvIndex][1];
+                const u = (rawUVs[uvIndex]![0]! / 3) + (axisIndex / 3);
+                const v = rawUVs[uvIndex]![1]!;
 
                 vertices.push(x, y, z, nx, ny, nz, u, v);
             }
