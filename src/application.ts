@@ -13,7 +13,7 @@ import { Input } from './input.js';
 import { Vector3D } from './vector.js';
 
 export class Application {
-    private context: Context;
+    public context: Context;
 
     private input: Input;
 
@@ -75,6 +75,10 @@ export class Application {
         this.input.flush();
 
         requestAnimationFrame((time: number) => this.render(time));
+    }
+
+    public updateEntities(entities: Entity[]): void {
+        this.entities = entities;
     }
 }
 

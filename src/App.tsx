@@ -67,6 +67,13 @@ const Button = styled.button`
     }
 `;
 
+const Select = styled.select`
+    font-size: 1.8rem;
+    min-height: 36px;
+    min-width: 280px;
+    padding: 0 10px;
+`;
+
 const DebugButton: FC = (): ReactNode => {
     const [isPressed, setIsPressed] = useState<boolean>(false);
 
@@ -83,6 +90,10 @@ const App = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const isInitialized = useRef(false);
+
+  const applicationRef = useRef<Application | null>(null);
+
+  const [entity, setEntity] = useState<string>('sphere');
 
   useEffect(() => {
     if (isInitialized.current || !canvasRef.current) {
@@ -101,11 +112,11 @@ const App = () => {
 
         const factory = new EntityFactory(context);
 
-        const entities: Entity[] = [
-          factory.createSphere('planet.jpg'),
-        ];
+        const application = new Application(context, [
+            factory.createSphere('planet.jpg'),
+        ]);
 
-        const application = new Application(context, entities);
+        applicationRef.current = application;
 
         requestAnimationFrame((time: number) => application.render(time));
       } catch (exception: unknown) {
@@ -116,6 +127,18 @@ const App = () => {
     bootWebGL();
   }, []);
 
+  useEffect(() => {
+      if (!applicationRef.current) {
+          return;
+      }
+
+      const factory = new EntityFactory(applicationRef.current.context);
+
+      const newEntity = entity === 'sphere' ? factory.createSphere('planet.jpg') : factory.createCube('crate.svg');
+
+      applicationRef.current.updateEntities([newEntity]);
+  }, [entity]);
+
   return (
     <Container>
       <Canvas ref={canvasRef} id="canvas" width="800" height="600" />
@@ -123,6 +146,11 @@ const App = () => {
       <ERROR id="error" />
 
       <DebugButton />
+
+      <Select id="geometry" onChange={(event) => setEntity(event.target.value)}>
+        <option value="sphere">Sphere</option>
+        <option value="cube">Cube</option>
+      </Select>
 
       <Input defaultValue="30" id="fieldOfView" label="FOV" max="120" min="30" step="15" type="range" />
 
@@ -132,11 +160,11 @@ const App = () => {
 
       <Input id="lightOrbit" label="Light Orbit" type="checkbox" />
       
-      <Input defaultValue="1" id="lightX" label="Light X" max="1" min="-1" step="0.1" type="range" />
+      <Input defaultValue="1" id="lightX" label="Light X" max="5" min="-5" step="0.1" type="range" />
 
-      <Input defaultValue="1" id="lightY" label="Light Y" max="1" min="-1" step="0.1" type="range" />
+      <Input defaultValue="1" id="lightY" label="Light Y" max="5" min="-5" step="0.1" type="range" />
 
-      <Input defaultValue="-1" id="lightZ" label="Light Z" max="1" min="-1" step="0.1" type="range" />
+      <Input defaultValue="-1" id="lightZ" label="Light Z" max="5" min="-5" step="0.1" type="range" />
 
       <Input defaultValue="#ffffff" id="lightColor" label="Light Color" type="color" />
 
