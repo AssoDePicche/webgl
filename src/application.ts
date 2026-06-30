@@ -62,9 +62,9 @@ export class Application {
             this.light.update(time);
         } else {
             this.light.setPosition(this.input.lightPosition);
-
-            this.light.color = this.input.lightColor;
         }
+
+        this.light.color = this.input.lightColor;
 
         this.context.clear();
 
